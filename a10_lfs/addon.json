@@ -1,0 +1,6 @@
+{
+"title" : "[LFS] A-10 Thunderbolt II",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.ini", "*.svn*"]
+}
