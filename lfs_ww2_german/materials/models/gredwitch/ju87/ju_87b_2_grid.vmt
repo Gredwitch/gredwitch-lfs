@@ -1,0 +1,7 @@
+// "VertexLitGeneric"
+// {
+	// $basetexture			"models/gredwitch/ju87/ju_87b_2_grid_c"
+	// $halflambert			1
+	// $nocull 				1
+	// $alphatest 				1
+// }

@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture"			"VGUI/entities/gred_lfs_fw190_a4"
+	"$vertexcolor" 			1
+	"$vertexalpha" 			1
+	"$nolod" 				1
+}

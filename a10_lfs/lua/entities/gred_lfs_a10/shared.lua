@@ -71,7 +71,7 @@ ENT.MaxHealth 		= 	1400
 ENT.MaxStability 	= 	0.5 -- lower this value if you encounter spazz. You can increase this up to 1 to aid turning performance at MaxPerfVelocity-speeds but be careful
 
 ENT.MaxPrimaryAmmo 	= 	1300   -- set to a positive number if you want to use weapons. set to -1 if you dont
-ENT.MaxSecondaryAmmo= 	21 -- set to a positive number if you want to use weapons. set to -1 if you dont
+ENT.MaxSecondaryAmmo= 	42 -- set to a positive number if you want to use weapons. set to -1 if you dont
 
 ENT.altitude 		=	0
 ENT.BulletPos 		= Vector(295,0,-16)

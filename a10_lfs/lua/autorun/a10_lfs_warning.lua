@@ -1,11 +1,10 @@
 if SERVER then AddCSLuaFile() end
 
 timer.Simple(5,function()
+	if CLIENT then
 		GredwitchBase=steamworks.ShouldMountAddon(1131455085) and steamworks.IsSubscribed(1131455085)
 		LFSBase=steamworks.ShouldMountAddon(1571918906) and steamworks.IsSubscribed(1571918906)
-	end
-	if !GredwitchBase then
-		if CLIENT then
+		if !GredwitchBase then
 			GredFrame=vgui.Create('DFrame')
 			GredFrame:SetTitle("Grediwtch's Base is not installed / enabled")
 			GredFrame:SetSize(ScrW()*0.95, ScrH()*0.95)
@@ -19,10 +18,9 @@ timer.Simple(5,function()
 			h:SetSize(x*0.99,y*0.96)
 			h:SetAllowLua(true)
 			h:OpenURL('https://steamcommunity.com/sharedfiles/filedetails/?id=1131455085.html')
+		
 		end
-	end
-	if !LFSBase then
-		if CLIENT then
+		if !LFSBase then
 			GredEMPFrame=vgui.Create('DFrame')
 			GredEMPFrame:SetTitle("LFS is not installed / enabled")
 			GredEMPFrame:SetSize(ScrW()*0.95, ScrH()*0.95)
