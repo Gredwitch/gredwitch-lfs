@@ -35,7 +35,7 @@ ENT.AITEAM 				= 1 -- 0 = FFA  1 = bad guys  2 = good guys
 
 ENT.Mass 				= 2000 -- lower this value if you encounter spazz
 ENT.Inertia 			= Vector(20000,20000,20000) -- you must increase this when you increase mass or it will spazz
-ENT.Drag 				= 1 -- drag is a good air brake but it will make diving speed worse
+ENT.Drag 				= -40 -- drag is a good air brake but it will make diving speed worse
 
 --ENT.HideDriver 		= true -- hide the driver?
 ENT.SeatPos 			= Vector(-22.7167,-2.3,11.7)
@@ -85,7 +85,8 @@ ENT.BOMBS = {
 ENT.TurretMuzzle		= {}
 ENT.TurretMuzzle[1]		= Vector(-103.85,-1.28882,36.5571)
 ENT.TurretMuzzle[2]		= Vector(-103.85,1.28882,36.5571)
-ENT.Loadouts			= 9
+-- ENT.Loadouts			= 7
+ENT.Loadouts			= 5
 function ENT:AddDataTables()
 	self:NetworkVar( "Int",13, "Loadout", { KeyName = "loadout", Edit = { type = "Int", order = 4,min = 0, max = self.Loadouts, category = "Weapons"} } )
 	

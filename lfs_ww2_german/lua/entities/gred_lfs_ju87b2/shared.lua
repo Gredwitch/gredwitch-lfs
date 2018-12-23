@@ -35,7 +35,7 @@ ENT.AITEAM 				= 1 -- 0 = FFA  1 = bad guys  2 = good guys
 
 ENT.Mass 				= 2000 -- lower this value if you encounter spazz
 ENT.Inertia 			= Vector(20000,20000,20000) -- you must increase this when you increase mass or it will spazz
-ENT.Drag 				= 1 -- drag is a good air brake but it will make diving speed worse
+ENT.Drag 				= -40 -- drag is a good air brake but it will make diving speed worse
 
 --ENT.HideDriver 		= true -- hide the driver?
 ENT.SeatPos 			= Vector(4,-2.345,107.909)

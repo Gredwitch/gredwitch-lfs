@@ -84,12 +84,16 @@ end
 
 function ENT:Initialize()
 	self.snd = {}
-	self.Bones = {}
+	self:CreateBones()
+end
+
+function ENT:CreateBones()
+	self.Bones = nil
 	timer.Simple(0,function()
+		self.Bones = {}
 		for i=0, self:GetBoneCount()-1 do
 			self.Bones[self:GetBoneName(i)] = i
 		end
-		self.Inited = true
 	end)
 end
 
@@ -114,8 +118,7 @@ function ENT:SoundStop(keepSiren)
 end
 
 function ENT:AnimFins()
-	if !self.Inited then return end
-	
+	if not self.Bones then self:CreateBones() return end
 	local FT = FrameTime() * 10
 	local Pitch = self:GetRotPitch()
 	local Yaw = self:GetRotYaw()
@@ -207,7 +210,7 @@ function ENT:AnimFins()
 end
 
 function ENT:AnimRotor()
-	if !self.Inited then return end
+	if not self.Bones then self:CreateBones() return end
 	
 	local RPM = self:GetRPM()
 	local PhysRot = RPM < 700
@@ -226,7 +229,7 @@ function ENT:AnimRotor()
 end
 
 function ENT:AnimCabin()
-	if !self.Inited then return end
+	if not self.Bones then self:CreateBones() return end
 	
 	local bOn = self:GetActive()
 	
@@ -239,7 +242,7 @@ function ENT:AnimCabin()
 end
 
 function ENT:AnimLandingGear()
-	if !self.Inited then return end
+	if not self.Bones then self:CreateBones() return end
 	
 	--[[ function gets called each frame by the base script. you can do whatever you want here ]]--
 end

@@ -42,6 +42,20 @@ sound.Add( 	{
 	level = 90,
 	sound = "gredwitch/common/mg151_stop.wav"
 } )
+sound.Add( 	{
+	name = "FW190_MK103_LASTSHOT",
+	channel = CHAN_WEAPON,
+	volume = 1.0,
+	level = 90,
+	sound = "gredwitch/common/mk103_stop.wav"
+} )
+sound.Add( 	{
+	name = "FW190_MK103_LOOP",
+	channel = CHAN_WEAPON,
+	volume = 1.0,
+	level = 90,
+	sound = "gredwitch/common/mk103_shoot.wav"
+} )
 
 -------------------------------------
 

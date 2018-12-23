@@ -33,8 +33,6 @@ function ENT:OnTick() -- use this instead of "think"
 	self:SetBodygroup(4,2)
 end
 
-
-
 function ENT:RunOnSpawn()
 	
 	self:SetGunnerSeat(self:AddPassengerSeat(Vector(-69.0436,0,6),Angle(0,90,0)))
@@ -134,8 +132,8 @@ function ENT:HandleWeapons(Fire1, Fire2)
 		
 		if self:GetAmmoSecondary() > 0 then
 			Fire2 = Driver:KeyDown( IN_ATTACK2 )
-			self.Firing = Fire2
 		end
+		self.Firing = Fire2
 	end
 	
 	if Fire1 then
@@ -212,7 +210,8 @@ function ENT:PrimaryAttack()
 		b.Caliber = "wac_base_40mm"
 		b.Size=0
 		b.Width=0
-		b.Damage=150
+		b.CustomDMG = true
+		b.Damage=307
 		b.Radius=50
 		b.sequential=true
 		b.npod=1

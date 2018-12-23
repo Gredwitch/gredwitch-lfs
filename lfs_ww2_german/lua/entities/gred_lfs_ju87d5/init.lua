@@ -120,69 +120,68 @@ function ENT:OnTick() -- use this instead of "think"
 			self:SetBodygroup(1,2)
 			self:SetBodygroup(2,1)
 			self:SetBodygroup(3,0)
-		elseif loadout == 6 then -- 3xSC500
-			if not (self.OldLoadout == loadout) then
-				self:AddBombs(loadout,3)
-			else
-				if ammo != self.OldSecAmmo then
-					self:AddBombs(loadout,ammo)
-				end
-			end
-			if ammo > 3 then
-				self:SetAmmoSecondary(3)
-			end
-			self:SetBodygroup(1,2)
-			self:SetBodygroup(2,1)
-			self:SetBodygroup(3,0)
-		elseif loadout == 7 then -- 1xSC1000
-			if not (self.OldLoadout == loadout) then
-				self:AddBombs(loadout,1)
-			else
-				if ammo != self.OldSecAmmo then
-					self:AddBombs(loadout,ammo)
-				end
-			end
-			if ammo > 1 then
-				self:SetAmmoSecondary(1)
-			end
-			self:SetBodygroup(1,2)
-			self:SetBodygroup(2,1)
-			self:SetBodygroup(3,0)
-		elseif loadout == 8 then -- 1xSC1000 + 4xSC100
-			if not (self.OldLoadout == loadout) then
-				self:AddBombs(loadout,5)
-			else
-				if ammo != self.OldSecAmmo then
-					self:AddBombs(loadout,ammo)
-				end
-			end
-			if ammo > 5 then
-				self:SetAmmoSecondary(5)
-			end
-			self:SetBodygroup(1,2)
-			self:SetBodygroup(2,1)
-			self:SetBodygroup(3,1)
-		elseif loadout == 9 then -- 1xSC1000 + 2xSC250
-			if not (self.OldLoadout == loadout) then
-				self:AddBombs(loadout,3)
-			else
-				if ammo != self.OldSecAmmo then
-					self:AddBombs(loadout,ammo)
-				end
-			end
-			if ammo > 3 then
-				self:SetAmmoSecondary(3)
-			end
-			self:SetBodygroup(1,2)
-			self:SetBodygroup(2,1)
-			self:SetBodygroup(3,0)
+		-- elseif loadout == 6 then -- 3xSC500
+			-- if not (self.OldLoadout == loadout) then
+				-- self:AddBombs(loadout,3)
+			-- else
+				-- if ammo != self.OldSecAmmo then
+					-- self:AddBombs(loadout,ammo)
+				-- end
+			-- end
+			-- if ammo > 3 then
+				-- self:SetAmmoSecondary(3)
+			-- end
+			-- self:SetBodygroup(1,2)
+			-- self:SetBodygroup(2,1)
+			-- self:SetBodygroup(3,0)
+		-- elseif loadout == 7 then -- 1xSC1000
+			-- if not (self.OldLoadout == loadout) then
+				-- self:AddBombs(loadout,1)
+			-- else
+				-- if ammo != self.OldSecAmmo then
+					-- self:AddBombs(loadout,ammo)
+				-- end
+			-- end
+			-- if ammo > 1 then
+				-- self:SetAmmoSecondary(1)
+			-- end
+			-- self:SetBodygroup(1,2)
+			-- self:SetBodygroup(2,1)
+			-- self:SetBodygroup(3,0)
+		-- elseif loadout == 8 then -- 1xSC1000 + 4xSC100
+			-- if not (self.OldLoadout == loadout) then
+				-- self:AddBombs(loadout,5)
+			-- else
+				-- if ammo != self.OldSecAmmo then
+					-- self:AddBombs(loadout,ammo)
+				-- end
+			-- end
+			-- if ammo > 5 then
+				-- self:SetAmmoSecondary(5)
+			-- end
+			-- self:SetBodygroup(1,2)
+			-- self:SetBodygroup(2,1)
+			-- self:SetBodygroup(3,1)
+		-- elseif loadout == 9 then -- 1xSC1000 + 2xSC250
+			-- if not (self.OldLoadout == loadout) then
+				-- self:AddBombs(loadout,3)
+			-- else
+				-- if ammo != self.OldSecAmmo then
+					-- self:AddBombs(loadout,ammo)
+				-- end
+			-- end
+			-- if ammo > 3 then
+				-- self:SetAmmoSecondary(3)
+			-- end
+			-- self:SetBodygroup(1,2)
+			-- self:SetBodygroup(2,1)
+			-- self:SetBodygroup(3,0)
 		end
 	end
 	self:SetBodygroup(4,1)
 	self.OldLoadout = loadout
 	self.OldSecAmmo = ammo
 end
-
 
 function ENT:AddBombs(n,b)
 	if self.Bombs then
@@ -658,8 +657,8 @@ function ENT:HandleWeapons(Fire1, Fire2)
 		
 		if self:GetAmmoSecondary() > 0 then
 			Fire2 = Driver:KeyDown( IN_ATTACK2 )
-			self.Firing = Fire2
 		end
+		self.Firing = Fire2
 	end
 	
 	if Fire1 then

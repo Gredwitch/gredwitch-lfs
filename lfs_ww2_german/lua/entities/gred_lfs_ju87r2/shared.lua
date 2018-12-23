@@ -35,7 +35,7 @@ ENT.AITEAM 				= 1 -- 0 = FFA  1 = bad guys  2 = good guys
 
 ENT.Mass 				= 2000 -- lower this value if you encounter spazz
 ENT.Inertia 			= Vector(20000,20000,20000) -- you must increase this when you increase mass or it will spazz
-ENT.Drag 				= 1 -- drag is a good air brake but it will make diving speed worse
+ENT.Drag 				= -40 -- drag is a good air brake but it will make diving speed worse
 
 --ENT.HideDriver 		= true -- hide the driver?
 ENT.SeatPos 			= Vector(4,-2.345,107.909)
@@ -53,7 +53,7 @@ ENT.RudderPos 			= Vector(-150,5,20) -- make sure you set these correctly or you
 ENT.MaxVelocity 		= 1600 -- max theoretical velocity at 0 degree climb
 ENT.MaxPerfVelocity 	= 1600 -- speed in which the plane will have its maximum turning potential
 
-ENT.MaxThrust 			= 350 -- max power of rotor
+ENT.MaxThrust 			= 600 -- max power of rotor
 
 ENT.MaxTurnPitch 		= 200 -- max turning force in pitch, lower this value if you encounter spazz
 ENT.MaxTurnYaw 			= 200 -- max turning force in yaw, lower this value if you encounter spazz

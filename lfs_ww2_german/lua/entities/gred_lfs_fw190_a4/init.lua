@@ -300,7 +300,12 @@ function ENT:FireCannons()
 			b.Caliber = "wac_base_20mm"
 			b.Size=0
 			b.Width=0
-			b.Damage=40
+			b.CustomDMG = true
+			if k >= 2 then
+				b.Damage=20
+			else
+				b.Damage=10
+			end
 			b.Radius=70
 			b.sequential=true
 			b.npod=1
@@ -311,9 +316,11 @@ function ENT:FireCannons()
 			b.Owner=Driver
 			if !tracerC then tracerC = 0 end
 			if tracerC >= GetConVarNumber("gred_sv_tracers") then
-				b:SetSkin(1)
+				b:SetSkin(0)
 				b:SetModelScale(20)
-				tracerC = 0
+				if k == 4 then
+					tracer = 0
+				end
 			else b.noTracer = true end
 			tracerC = tracerC + 1
 			if (k == 2) then self.NextCannon = ct + 0.08 self:TakeCannonAmmo(2) end
@@ -353,7 +360,8 @@ function ENT:PrimaryAttack()
 		b.Caliber = "wac_base_7mm"
 		b.Size=0
 		b.Width=0
-		b.Damage=40
+		b.CustomDMG = true
+		b.Damage=5
 		b.Radius=70
 		b.sequential=true
 		b.npod=1
@@ -364,9 +372,11 @@ function ENT:PrimaryAttack()
 		b.Owner=Driver
 		if !tracer then tracer = 0 end
 		if tracer >= GetConVarNumber("gred_sv_tracers") then
-			b:SetSkin(1)
+			b:SetSkin(0)
 			b:SetModelScale(20)
-			tracer = 0
+			if k == 2 then
+				tracer = 0
+			end
 		else b.noTracer = true end
 		self:TakePrimaryAmmo()
 		net.Start("gred_net_wac_mg_muzzle_fx")

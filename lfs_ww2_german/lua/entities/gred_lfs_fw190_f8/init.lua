@@ -52,7 +52,7 @@ function ENT:OnTick() -- use this instead of "think"
 			self:SetAmmoSecondary(0)
 			self:SetBodygroup(4,0) -- Bomb pylon
 			self:SetBodygroup(3,0) -- Wing stuff
-		elseif loadout == 6 then -- 4xSC100
+		elseif loadout == 1 then -- 4xSC100
 			if not (self.OldLoadout == loadout) then
 				self:AddBombs(1)
 			else
@@ -65,7 +65,7 @@ function ENT:OnTick() -- use this instead of "think"
 			end
 			self:SetBodygroup(3,0) -- Wing stuff
 			self:SetBodygroup(4,2) -- Bomb pylon
-		elseif loadout == 5 then  -- 8xSC100
+		elseif loadout == 2 then  -- 8xSC100
 			if not (self.OldLoadout == loadout) then
 				self:AddBombs(1,8)
 			else
@@ -78,7 +78,7 @@ function ENT:OnTick() -- use this instead of "think"
 			end
 			self:SetBodygroup(3,4) -- Wing stuff
 			self:SetBodygroup(4,2) -- Bomb pylon
-		elseif loadout == 4 then  -- 1xSC250
+		elseif loadout == 3 then  -- 1xSC250
 			if not (self.OldLoadout == loadout) then
 				self:AddBombs(3)
 			else
@@ -91,7 +91,7 @@ function ENT:OnTick() -- use this instead of "think"
 			end
 			self:SetBodygroup(3,0) -- Wing stuff
 			self:SetBodygroup(4,1) -- Bomb pylon
-		elseif loadout == 3 then  -- 1xSC250 + 4xSC100
+		elseif loadout == 4 then  -- 1xSC250 + 4xSC100
 			if not (self.OldLoadout == loadout) then
 				self:AddBombs(4,5)
 			else
@@ -104,7 +104,7 @@ function ENT:OnTick() -- use this instead of "think"
 			end
 			self:SetBodygroup(3,4) -- Wing stuff
 			self:SetBodygroup(4,1) -- Bomb pylon
-		elseif loadout == 2 then  -- 1xSC500
+		elseif loadout == 5 then  -- 1xSC500
 			if not (self.OldLoadout == loadout) then
 				self:AddBombs(5)
 			else
@@ -117,7 +117,7 @@ function ENT:OnTick() -- use this instead of "think"
 			end
 			self:SetBodygroup(3,0) -- Wing stuff
 			self:SetBodygroup(4,1) -- Bomb pylon
-		elseif loadout == 1 then  -- 1xSC500 + 4xSC100
+		elseif loadout == 6 then  -- 1xSC500 + 4xSC100
 			if not (self.OldLoadout == loadout) then
 				self:AddBombs(6,5)
 			else
@@ -130,6 +130,44 @@ function ENT:OnTick() -- use this instead of "think"
 			end
 			self:SetBodygroup(3,4) -- Wing stuff
 			self:SetBodygroup(4,1) -- Bomb pylon
+		elseif loadout == 7 then  -- 1xSC1000
+			if not (self.OldLoadout == loadout) then
+				self:AddBombs(7)
+			else
+				if ammo != self.OldSecAmmo then
+					self:AddBombs(7,ammo)
+				end
+			end
+			if ammo > 1 then
+				self:AddBombs(7,1)
+			end
+			self:SetBodygroup(3,0) -- Wing stuff
+			self:SetBodygroup(4,1) -- Bomb pylon
+		elseif loadout == 8 then  -- 1xSC1000 + 4xSC100
+			if not (self.OldLoadout == loadout) then
+				self:AddBombs(8,5)
+			else
+				if ammo != self.OldSecAmmo then
+					self:AddBombs(8,ammo)
+				end
+			end
+			if ammo > 5 then
+				self:AddBombs(8,5)
+			end
+			self:SetBodygroup(3,4) -- Wing stuff
+			self:SetBodygroup(4,1) -- Bomb pylon
+		elseif loadout == 9 then  -- Mk 109
+			if self.Bombs then
+				for k,v in pairs(self.Bombs) do
+					if IsValid(v) then v:Remove() end
+				end
+				self.Bombs = nil
+			end
+			if not (self.OldLoadout == loadout) then
+				self:SetAmmoSecondary(70)
+			end
+			self:SetBodygroup(4,0) -- Bomb pylon
+			self:SetBodygroup(3,2) -- Wing stuff
 		end
 	end
 	self.OldLoadout = loadout

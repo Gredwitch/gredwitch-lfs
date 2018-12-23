@@ -205,8 +205,8 @@ function ENT:HandleWeapons(Fire1, Fire2)
 		
 		if self:GetAmmoSecondary() > 0 then
 			Fire2 = Driver:KeyDown( IN_ATTACK2 )
-			self.Firing = Fire2
 		end
+		self.Firing = Fire2
 	end
 	
 	if Fire1 then
@@ -323,7 +323,9 @@ function ENT:PrimaryAttack()
 		if tracer >= GetConVarNumber("gred_sv_tracers") then
 			b:SetSkin(0)
 			b:SetModelScale(20)
-			tracer = 0
+			if k == 2 then
+				tracer = 0
+			end
 		else b.noTracer = true end
 		self:TakePrimaryAmmo()
 		net.Start("gred_net_wac_mg_muzzle_fx")
