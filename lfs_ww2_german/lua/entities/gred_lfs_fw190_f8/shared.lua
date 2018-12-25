@@ -29,7 +29,7 @@ ENT.WheelMass 		= 	200 -- wheel mass is 1 when the landing gear is retracted
 ENT.WheelRadius 	= 	15
 ENT.WheelPos_L 		= 	Vector(79.93,-101.561,-87.2068)
 ENT.WheelPos_R 		= 	Vector(79.93,101.561,-87.2068)
-ENT.WheelPos_F 		= 	Vector(-198.527,0,-21.96124)
+ENT.WheelPos_C 		= 	Vector(-198.527,0,-21.96124)
 
 ENT.AITEAM 				= 1 -- 0 = FFA  1 = bad guys  2 = good guys
 

@@ -603,13 +603,7 @@ function ENT:OnEngineStopped()
 end
 
 function ENT:OnLandingGearToggled( bOn )
-	-- self:EmitSound( "vehicles/tank_readyfire1.wav" )
-	
-	-- if bOn then
-		-- [[ set bodygroup of landing gear down? ]]--
-	-- else
-		-- [[ set bodygroup of landing gear up? ]]--
-	-- end
+	self:EmitSound( "lfs/bf109/gear.wav" )
 end
 
 function ENT:HandleActive()

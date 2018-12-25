@@ -68,10 +68,13 @@ function ENT:Initialize()
 end
 
 function ENT:CreateBones()
-	self.Bones = {}
-	for i=0, self:GetBoneCount()-1 do
-		self.Bones[self:GetBoneName(i)] = i
-	end
+	self.Bones = nil
+	timer.Simple(0,function()
+		self.Bones = {}
+		for i=0, self:GetBoneCount()-1 do
+			self.Bones[self:GetBoneName(i)] = i
+		end
+	end)
 end
 
 function ENT:OnRemove()
@@ -93,7 +96,7 @@ function ENT:SoundStop()
 end
 
 function ENT:AnimFins()
-	if not self.Bones.gear_r_1 then self:CreateBones() return end
+	if not self.Bones then self:CreateBones() return end
 	local FT = FrameTime() * 10
 	local Pitch = self:GetRotPitch()
 	local Yaw = self:GetRotYaw()
@@ -173,7 +176,7 @@ function ENT:AnimFins()
 end
 
 function ENT:AnimRotor()
-	if not self.Bones.gear_r_1 then self:CreateBones() return end
+	if not self.Bones then self:CreateBones() return end
 	local RPM = self:GetRPM()
 	local PhysRot = RPM < 700
 	self.RPM = self.RPM and (self.RPM + RPM * FrameTime() * (PhysRot and 3 or 1)) or 0
@@ -185,7 +188,7 @@ function ENT:AnimRotor()
 end
 
 function ENT:AnimCabin()
-	if not self.Bones.gear_r_1 then self:CreateBones() return end
+	if not self.Bones then self:CreateBones() return end
 	local bOn = self:GetActive()
 	
 	local TVal = bOn and 0 or 1
@@ -202,7 +205,7 @@ function ENT:AnimCabin()
 end
 
 function ENT:AnimLandingGear()
-	if not self.Bones.gear_r_1 then self:CreateBones() return end
+	if not self.Bones then self:CreateBones() return end
 	self.SMLG = self.SMLG and self.SMLG + ((1 - self:GetLGear()) - self.SMLG) * FrameTime() * 8 or 0
 	self.SMRG = self.SMRG and self.SMRG + ((1 - self:GetRGear()) - self.SMRG) * FrameTime() * 8 or 0
 	
