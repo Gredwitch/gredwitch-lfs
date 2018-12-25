@@ -66,47 +66,35 @@ ENT.MaxHealth 			= 800
 --ENT.Stability 		= 0.7   -- if you uncomment this the plane will always be able to turn at maximum performance. This causes MaxPerfVelocity to get ignored
 ENT.MaxStability 		= 0.7 -- lower this value if you encounter spazz. You can increase this up to 1 to aid turning performance at MaxPerfVelocity-speeds but be careful
 
-ENT.MaxSecondaryAmmo 	= 2 -- set to a positive number if you want to use weapons. set to -1 if you dont
+ENT.MaxSecondaryAmmo 	= 8 -- set to a positive number if you want to use weapons. set to -1 if you dont
 
 ENT.BulletPos			= {}
-ENT.BulletPos[1]		= Vector(89.94,5.63,30.58)
-ENT.BulletPos[2]		= Vector(89.94,-5.63,30.58)
+ENT.BulletPos[1]		= Vector(89.94,-5.63,30.58)
+ENT.BulletPos[2]		= Vector(97.1099,-42.0802,-15.886)
+ENT.BulletPos[3]		= Vector(97.1099,42.0802,-15.886)
+ENT.MaxPrimaryAmmo 		= 750
 
-ENT.NextMGFF			= 0
-ENT.NextCannon			= 0
-ENT.AmmoMGFF			= 280
-ENT.AmmoCannon			= 500
-ENT.MaxPrimaryAmmo 		= 900
+ENT.Loadouts			= 6 -- 2 loaoduts
 
-ENT.CannonPos			= {}
-ENT.CannonPos[1]		= Vector(83.8659,-106.278,-9.00239)
-ENT.CannonPos[2]		= Vector(83.8659,106.278,-9.00239)
-ENT.CannonPos[3]		= Vector(97.1099,-42.0802,-15.886)
-ENT.CannonPos[4]		= Vector(97.1099,42.0802,-15.886)
-
-ENT.Loadouts			= 1 -- 2 loaoduts
-
-ENT.MISSILEMDL 			= "models/gbombs/nebelwerfer_rocket.mdl"
-ENT.MISSILES			= {
-			[1]			= { Vector(45.6383,116.836,-23.1549), Vector(45.6383,-116.836,-23.1549) }
+ENT.BOMBS = {
+	[1] = Vector(42.9327,0,-40.8034),
+	[2] = Vector(75.8759,-4.748,-50.52),
+	[3] = Vector(75.8759,4.748,-50.52),
+	[4] = Vector(12.4919,-4.748,-47.308),
+	[5] = Vector(12.4919,4.748,-47.308),
+	[6] = Vector(30.5611,-119.483,-18.4986),
+	[7] = Vector(32.1203,-103.998,-20.7425),
+	[8] = Vector(30.5611,119.483,-18.4986),
+	[9] = Vector(32.1203,103.998,-20.7425),
+	[10] = Vector(75.8759,-4.748,-50.52),
+	[11] = Vector(75.8759,4.748,-50.52),
 }
 
 
--- ENT.BOMBS = {
-	-- [1] = { Vector(17.41,182.4,80), Vector(17.41,-182.4,80) },
-	-- [2] = { Vector(17.87,194.9,81.76), Vector(17.87,-194.9,81.76) },
-	-- [3] = { Vector(44.3,0,68)},
--- }
-
-
 function ENT:AddDataTables()
-	self:NetworkVar( "Int",11, "AmmoCannon", { KeyName = "cannonammo", Edit = { type = "Int", order = 3,min = 0, max = self.AmmoCannon, category = "Weapons"} } )
-	self:NetworkVar( "Int",12, "AmmoMGFF", { KeyName = "mgffammo", Edit = { type = "Int", order = 3,min = 0, max = self.AmmoMGFF, category = "Weapons"} } )
 	self:NetworkVar( "Int",13, "Loadout", { KeyName = "loadout", Edit = { type = "Int", order = 4,min = 0, max = self.Loadouts, category = "Weapons"} } )
 	
 	if SERVER then
-		self:SetAmmoMGFF(self:GetMaxAmmoMGFF())
-		self:SetAmmoCannon(self:GetMaxAmmoCannon())
 		self:SetLoadout(math.random(0,self.Loadouts))
 	end
 end

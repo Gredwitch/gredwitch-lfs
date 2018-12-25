@@ -66,11 +66,31 @@ ENT.MaxHealth 			= 700
 ENT.MaxStability 		= 0.7 -- lower this value if you encounter spazz. You can increase this up to 1 to aid turning performance at MaxPerfVelocity-speeds but be careful
 
 ENT.MaxPrimaryAmmo 		= 1000   -- set to a positive number if you want to use weapons. set to -1 if you dont
-ENT.MaxSecondaryAmmo 	= 6 -- set to a positive number if you want to use weapons. set to -1 if you dont
+ENT.MaxSecondaryAmmo 	= 3000 -- set to a positive number if you want to use weapons. set to -1 if you dont
 
 ENT.BulletPos			= {}
 ENT.BulletPos[1]		= Vector(61.7917,-85.0942,-12.3775)
 ENT.BulletPos[2]		= Vector(61.7917,85.0942,-12.3775)
+
+ENT.MG151Pos			= {}
+ENT.MG151Pos[1]			= Vector(64.784,192.998,-30.7511)
+ENT.MG151Pos[2]			= Vector(64.784,-192.998,-30.7511)
+ENT.MG151Pos[3]			= Vector(64.784,-178.823,-30.7511)
+ENT.MG151Pos[4]			= Vector(64.784,178.823,-30.7511)
+
+ENT.MG81Pos				= {}
+ENT.MG81Pos[1]			= Vector(38.208,184.793,-26.2772)
+ENT.MG81Pos[2]			= Vector(38.208,-184.793,-26.2772)
+ENT.MG81Pos[3]			= Vector(38.208,187.349,-26.2772)
+ENT.MG81Pos[4]			= Vector(38.208,-187.349,-26.2772)
+ENT.MG81Pos[5]			= Vector(27.472,193.945,-30.6842)
+ENT.MG81Pos[6]			= Vector(27.472,-193.945,-30.6842)
+ENT.MG81Pos[7]			= Vector(27.472,191.467,-30.6842)
+ENT.MG81Pos[8]			= Vector(27.472,-191.467,-30.6842)
+ENT.MG81Pos[9]			= Vector(27.472,180.671,-30.6842)
+ENT.MG81Pos[10]			= Vector(27.472,-180.671,-30.6842)
+ENT.MG81Pos[11]			= Vector(27.472,178.2,-30.6842)
+ENT.MG81Pos[12]			= Vector(27.472,-178.2,-30.6842)
 
 ENT.BOMBS = {
 	[1] = Vector(-7.89679,-194.302,-15),
@@ -85,8 +105,7 @@ ENT.BOMBS = {
 ENT.TurretMuzzle		= {}
 ENT.TurretMuzzle[1]		= Vector(-103.85,-1.28882,36.5571)
 ENT.TurretMuzzle[2]		= Vector(-103.85,1.28882,36.5571)
--- ENT.Loadouts			= 7
-ENT.Loadouts			= 5
+ENT.Loadouts			= 7
 function ENT:AddDataTables()
 	self:NetworkVar( "Int",13, "Loadout", { KeyName = "loadout", Edit = { type = "Int", order = 4,min = 0, max = self.Loadouts, category = "Weapons"} } )
 	

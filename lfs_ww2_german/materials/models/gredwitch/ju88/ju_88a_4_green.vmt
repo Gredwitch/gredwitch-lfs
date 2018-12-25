@@ -1,0 +1,21 @@
+"VertexLitGeneric"
+{
+	$basetexture			"models/gredwitch/ju88/ju_88a_4_green_a"
+	$bumpmap				"models/gredwitch/ju88/ju_88a_4_green_n"
+	$halflambert			1
+	$nocull 				1
+	$alphatest 				1
+
+	$phongexponenttexture 	"models/gredwitch/ju88/ju_88a_4_green_n"
+	$phong 					1
+	$phongboost 			0.2
+	$phongfresnelranges		"[2 2 2]"
+
+	$PhongAlbedoTint 		1
+
+	$rimlight     			0
+	$rimlightexponent   	1
+	$rimlightboost   		0.3
+	$rimmask      			1
+	$translucent			0
+}

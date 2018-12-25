@@ -166,14 +166,14 @@ function ENT:HandleWeapons(Fire1, Fire2)
 			end
 			if MGFFSnd then
 				if mgff > 0 then
-					self.wpn2 = CreateSound( self, "FW190_FIRE_LOOP" )
+					self.wpn2 = CreateSound( self, "BF109_FIRE2_LOOP" )
 					self.wpn2:Play()
 				else
 					if self.wpn2 then
 						self.wpn2:Stop()
 					end
 					self.wpn2 = nil
-					self:EmitSound( "FW190_FIRE_LASTSHOT" )
+					self:EmitSound( "BF109_FIRE2_LASTSHOT" )
 				end
 				self:CallOnRemove( "stopmesounds2", function( ent )
 					if ent.wpn2 then

@@ -174,7 +174,7 @@ function ENT:OnTick() -- use this instead of "think"
 	self.OldSecAmmo = ammo
 	
 	self:SetBodygroup(2,1) -- MG FF
-	self:SetBodygroup(5,1) -- MG 17
+	self:SetBodygroup(5,0) -- MG 17
 	self:SetBodygroup(6,0) -- MG 151 / MG 17
 end
 
@@ -535,12 +535,14 @@ end
 
 function ENT:HandleWeapons(Fire1, Fire2)
 	local Driver = self:GetDriver()
+	local ca=self:GetAmmoCannon()
 	if IsValid( Driver ) then
 		if self:GetAmmoPrimary() > 0 then
 			Fire1 = Driver:KeyDown( IN_ATTACK )
+		end
+		if ca > 0 then
 			FireCannons = Driver:KeyDown( IN_ATTACK )
 		end
-		
 		if self:GetAmmoSecondary() > 0 then
 			Fire2 = Driver:KeyDown( IN_ATTACK2 )
 		end
@@ -549,8 +551,10 @@ function ENT:HandleWeapons(Fire1, Fire2)
 	
 	if Fire1 then
 		self:PrimaryAttack()
+	end
+	
+	if FireCannons then
 		self:FireCannons()
-		
 	end
 	
 	if Fire2 then
@@ -579,6 +583,38 @@ function ENT:HandleWeapons(Fire1, Fire2)
 		end
 		
 		self.OldFire = Fire1
+	end
+	
+	if self.OldCannon ~= FireCannons then
+		
+		if FireCannons then
+			self.wpn3 = CreateSound( self, "FW190_FIRE_LOOP" )
+			self.wpn3:Play()
+			self:CallOnRemove( "stopmesounds3", function( ent )
+				if ent.wpn3 then
+					ent.wpn3:Stop()
+				end
+			end)
+		else
+			if self.OldCannon == true then
+				if self.wpn3 then
+					self.wpn3:Stop()
+				end
+				self.wpn3 = nil
+					
+				self:EmitSound( "FW190_FIRE_LASTSHOT" )
+			end
+		end
+		
+		self.OldCannon = FireCannons
+	else
+		if ca <= 0 then
+			if self.wpn3 then
+				self.wpn3:Stop()
+				self:EmitSound( "FW190_FIRE_LASTSHOT" )
+				self.wpn3 = nil
+			end
+		end
 	end
 	
 	if self.OldFire2 ~= Fire2 then

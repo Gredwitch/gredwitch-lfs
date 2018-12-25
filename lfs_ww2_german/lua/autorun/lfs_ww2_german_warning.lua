@@ -56,6 +56,13 @@ sound.Add( 	{
 	level = 90,
 	sound = "gredwitch/common/mk103_shoot.wav"
 } )
+sound.Add( 	{
+	name = "FW190_MK108_LOOP",
+	channel = CHAN_WEAPON,
+	volume = 1.0,
+	level = 90,
+	sound = "gredwitch/common/mk108_shoot.wav"
+} )
 
 -------------------------------------
 
@@ -164,6 +171,49 @@ sound.Add( 	{
 	volume = 1.0,
 	level = 125,
 	sound = "^gredwitch/fw190_lfs/fw190_dist.wav"
+} )
+-------------------------------------
+sound.Add( 	{
+	name = "JU88_RPM0",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 125,
+	sound = "^gredwitch/JU88_lfs/JU88_rpm1.wav"
+} )
+sound.Add( 	{
+	name = "JU88_RPM1",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 125,
+	sound = "^gredwitch/JU88_lfs/JU88_rpm2.wav"
+} )
+sound.Add( 	{
+	name = "JU88_RPM2",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 125,
+	sound = "^gredwitch/JU88_lfs/JU88_rpm3.wav"
+} )
+sound.Add( 	{
+	name = "JU88_START",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 90,
+	sound = "gredwitch/JU88_lfs/JU88_start.wav"
+} )
+sound.Add( 	{
+	name = "JU88_STOP",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 90,
+	sound = "gredwitch/JU88_lfs/JU88_stop.wav"
+} )
+sound.Add( 	{
+	name = "JU88_DIST",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 125,
+	sound = "^gredwitch/JU88_lfs/JU88_dist.wav"
 } )
 
 timer.Simple(5,function()
