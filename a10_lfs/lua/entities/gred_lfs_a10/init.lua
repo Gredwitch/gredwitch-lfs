@@ -90,11 +90,10 @@ function ENT:OnTick()
 		self.sounds_a10.far_shoot:Stop()
 		self.sounds_a10.close_stop:PlayEx(1,100)
 		self.sounds_a10.far_stop:PlayEx(1,100)
-		
+		self.ShouldPlayStopSound = false
 		for k,v in pairs(player.GetHumans()) do
-		local d = self:GetDriver()
-		
-		if IsValid(d) && v == d:GetViewEntity() then return end
+			local d = self:GetDriver()
+			if IsValid(d) && v == d:GetViewEntity() then return end
 			timer.Simple(2,function()
 				net.Start("gred_net_sound_lowsh")
 					net.WriteString("gunsounds/brrt_0"..math.random(1,4)..".wav")
@@ -102,7 +101,6 @@ function ENT:OnTick()
 			end)
 		end
 		
-		self.ShouldPlayStopSound = false
 	end
 end
 function ENT:OnRemove()
