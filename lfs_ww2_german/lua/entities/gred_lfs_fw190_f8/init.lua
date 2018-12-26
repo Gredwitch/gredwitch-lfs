@@ -734,7 +734,6 @@ function ENT:PrimaryAttack()
 end
 
 function ENT:SecondaryAttack()
-	if self:GetAI() then return end
 	if not self:CanSecondaryAttack() then return end
 
 	local loadout = self:GetLoadout()
@@ -780,6 +779,7 @@ function ENT:SecondaryAttack()
 			net.Broadcast()
 		end
 	else
+		if self:GetAI() then return end
 		self:SetNextSecondary( 0.4 )
 		self:TakeSecondaryAmmo()
 		if istable( self.Bombs ) then

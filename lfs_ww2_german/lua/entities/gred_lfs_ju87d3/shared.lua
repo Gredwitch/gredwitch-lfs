@@ -45,25 +45,25 @@ ENT.IdleRPM 			= 300 -- idle rpm. this can be used to tweak the minimum flight s
 ENT.MaxRPM 				= 2800 -- rpm at 100% throttle
 ENT.LimitRPM 			= 3000 -- max rpm when holding throttle key
 
-ENT.RotorPos 			= Vector(106.8,0,73.35) -- make sure you set these correctly or your plane will act wierd
-ENT.WingPos 			= Vector(50,5,20) -- make sure you set these correctly or your plane will act wierd
-ENT.ElevatorPos 		= Vector(-150,5,20) -- make sure you set these correctly or your plane will act wierd
-ENT.RudderPos 			= Vector(-150,5,20) -- make sure you set these correctly or your plane will act wierd
+ENT.RotorPos 			= Vector(150.241,0,7.08415) -- make sure you set these correctly or your plane will act wierd
+ENT.WingPos 			= Vector(-1.14881,13.6605,-4.82628) -- make sure you set these correctly or your plane will act wierd
+ENT.ElevatorPos 		= Vector(-291.735,0,30.6403) -- make sure you set these correctly or your plane will act wierd
+ENT.RudderPos 			= Vector(-317.832,0,39.1543) -- make sure you set these correctly or your plane will act wierd
 
 ENT.MaxVelocity 		= 1500 -- max theoretical velocity at 0 degree climb
-ENT.MaxPerfVelocity 	= 1000 -- speed in which the plane will have its maximum turning potential
+ENT.MaxPerfVelocity 	= 1500 -- speed in which the plane will have its maximum turning potential
 
-ENT.MaxThrust 			= 500 -- max power of rotor
+ENT.MaxThrust 			= 520 -- max power of rotor
 
-ENT.MaxTurnPitch 		= 200 -- max turning force in pitch, lower this value if you encounter spazz
+ENT.MaxTurnPitch 		= 300 -- max turning force in pitch, lower this value if you encounter spazz
 ENT.MaxTurnYaw 			= 100 -- max turning force in yaw, lower this value if you encounter spazz
-ENT.MaxTurnRoll 		= 120 -- max turning force in roll, lower this value if you encounter spazz
+ENT.MaxTurnRoll 		= 150 -- max turning force in roll, lower this value if you encounter spazz
 
 ENT.MaxHealth 			= 700
 --ENT.MaxShield 		= 200  -- uncomment this if you want to use deflector shields. Dont use excessive amounts because it regenerates.
 
 --ENT.Stability 		= 0.7   -- if you uncomment this the plane will always be able to turn at maximum performance. This causes MaxPerfVelocity to get ignored
-ENT.MaxStability 		= 0.7 -- lower this value if you encounter spazz. You can increase this up to 1 to aid turning performance at MaxPerfVelocity-speeds but be careful
+ENT.MaxStability 		= 0.4 -- lower this value if you encounter spazz. You can increase this up to 1 to aid turning performance at MaxPerfVelocity-speeds but be careful
 
 ENT.MaxPrimaryAmmo 		= 2000   -- set to a positive number if you want to use weapons. set to -1 if you dont
 ENT.MaxSecondaryAmmo 	= 6 -- set to a positive number if you want to use weapons. set to -1 if you dont

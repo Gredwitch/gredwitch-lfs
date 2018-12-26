@@ -1,22 +1,17 @@
 
 include("shared.lua")
 
-function ENT:LFSCalcViewFirstPerson( view ) -- modify first person camera view here
-	--[[
+function ENT:LFSCalcViewThirdPerson( view ) -- modify third person camera view here
+
 	local ply = LocalPlayer()
 	if ply == self:GetDriver() then
-		-- driver view
+		
 	elseif ply == self:GetGunner() then
-		-- gunner view
+	elseif ply == self:GetGunter() then
 	else
 		-- everyone elses view
 	end
-	]]--
 	
-	return view
-end
-
-function ENT:LFSCalcViewThirdPerson( view ) -- modify third person camera view here
 	return view
 end
 
@@ -70,9 +65,16 @@ end
 function ENT:CreateBones()
 	self.Bones = nil
 	timer.Simple(0,function()
+		if not self && IsValid(self) then return end
 		self.Bones = {}
+		local name
 		for i=0, self:GetBoneCount()-1 do
-			self.Bones[self:GetBoneName(i)] = i
+			name = self:GetBoneName(i)
+			if name == "__INVALIDBONE__" then
+				self.Bones = nil
+				break
+			end
+			self.Bones[name] = i
 		end
 	end)
 end
@@ -123,7 +125,7 @@ function ENT:AnimFins()
 	speed_meters = (self:GetVelocity():Length()*METER_IN_UNIT)*-2 -- Speed in m/s
 	self:ManipulateBoneAngles(self.Bones.speed,Angle(0,speed_meters))
 	
-	local VertANG = Angle(((self:GetVelocity().z/24)),0,0)
+	local VertANG = Angle(0,0,((self:GetVelocity().z/24)))
 	self:ManipulateBoneAngles(self.Bones.vario,VertANG)
 	
 	local ang = self:GetAngles()
@@ -133,11 +135,17 @@ function ENT:AnimFins()
 	elseif
 		Pitch < 0 && Pitch < -90 then Pitch = -90
 	end
-	Pitch = Angle(0,0,-Pitch)
-	local Roll = Angle(0,-ang.r)
+	Pitch = Angle(-Pitch)
+	local Roll = Angle(0,-ang.r+90)
 	self:ManipulateBoneAngles(self.Bones.aviahorizon_pitch,Roll+Pitch)
-	self:ManipulateBoneAngles(self.Bones.compass,Angle(0,ang.y))
+	self:ManipulateBoneAngles(self.Bones.compass,Angle(ang.y))
 
+	local r = ang.r
+	if r > 15 then r = 15 elseif r < -15 then r = -15 end
+	self:ManipulateBoneAngles(self.Bones.bank,Angle(0,r))
+	self:ManipulateBoneAngles(self.Bones.bank1,Angle(0,r))
+	self:ManipulateBoneAngles(self.Bones.turn,Angle(0,r))
+	
 	local trace = {
 		start = self:GetPos(),
 		endpos = self:GetPos()-Vector(0,0,10000/FEET_IN_METER/METER_IN_UNIT),
@@ -148,9 +156,12 @@ function ENT:AnimFins()
 		self.altitude = trace.Fraction*10000
 	end
 	local alt = Angle(0,-self.altitude/7) -- Altitude in M
-	-- self:ManipulateBoneAngles(self.Bones.,alt)
-	
-	local Throttle = Angle(0,0,(math.max( math.Round( ((self:GetRPM() - self:GetIdleRPM()) / (self:GetMaxRPM() - self:GetIdleRPM())) * 100, 0) ,0)))
+	self:ManipulateBoneAngles(self.Bones.altitude_min,alt)
+	local RPM = self:GetRPM()
+	local rpm = Angle(0,-RPM/10)
+	self:ManipulateBoneAngles(self.Bones.rpm,rpm) -- RPM
+	self:ManipulateBoneAngles(self.Bones.rpm1,rpm) -- RPM
+	local Throttle = Angle(0,0,(math.max( math.Round( ((RPM - self:GetIdleRPM()) / (self:GetMaxRPM() - self:GetIdleRPM())) * 100, 0) ,0)))
 	-- print(Throttle)
 	self:ManipulateBoneAngles(self.Bones.manifold_pressure,Angle(0,-Throttle.r*1.5))
 	self:ManipulateBoneAngles(self.Bones.manifold_pressure1,Angle(0,-Throttle.r*1.5))

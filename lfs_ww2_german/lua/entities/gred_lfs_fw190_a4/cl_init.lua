@@ -20,6 +20,12 @@ function ENT:LFSCalcViewThirdPerson( view ) -- modify third person camera view h
 	return view
 end
 
+
+function ENT:LFSHudPaint( X, Y, data ) -- driver only
+	draw.SimpleText( "MGFF", "LFS_FONT", 10, 135, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( self:GetAmmoMGFF(), "LFS_FONT", 120, 135, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+end
+
 function ENT:CalcEngineSound( RPM, Pitch, Doppler )
 	local Low = 500
 	local Mid = 1000
@@ -70,9 +76,16 @@ end
 function ENT:CreateBones()
 	self.Bones = nil
 	timer.Simple(0,function()
+		if not self && IsValid(self) then return end
 		self.Bones = {}
+		local name
 		for i=0, self:GetBoneCount()-1 do
-			self.Bones[self:GetBoneName(i)] = i
+			name = self:GetBoneName(i)
+			if name == "__INVALIDBONE__" then
+				self.Bones = nil
+				break
+			end
+			self.Bones[name] = i
 		end
 	end)
 end

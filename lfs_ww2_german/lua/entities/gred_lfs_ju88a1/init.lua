@@ -16,7 +16,17 @@ end
 
 function ENT:OnTick() -- use this instead of "think"
 	local hp = self:GetHP()
-	if hp <= 350 then self:SetSkin(1) else self:SetSkin(0) end
+	local skin = self:GetSkin()
+	if hp <= 600 then
+		if table.HasValue(self.DamageSkin,skin) then return end
+		if table.HasValue(self.CleanSkin,skin) then
+			self:SetSkin(skin + 1)
+		end
+	else
+		if table.HasValue(self.DamageSkin,skin) then
+			self:SetSkin(skin-1)
+		end
+	end
 	local ammo = self:GetAmmoSecondary()
 	local loadout = self:GetLoadout()
 	if ammo == 0 and self.Bombs then
@@ -245,7 +255,17 @@ function ENT:RunOnSpawn()
 	self:SetGunnerSeat(self:AddPassengerSeat(Vector(173.908,11.1736,85.4852),Angle(0,90,0)))
 	self:SetGunterSeat(self:AddPassengerSeat(Vector(200.354,-11.7944,69.0472),Angle(0,90,-130)))
 	self:AddBombs(self:GetLoadout())
-	-- self:AddPassengerSeat( Vector(-30,0,18), Angle(0,-90,0) )
+	self.DamageSkin = {}
+	self.CleanSkin  = {}
+	for i = 0, self:SkinCount() do
+		num = i / 2
+		IsEven = math.Round(num)*2 == i
+		if IsEven then
+			table.insert(self.CleanSkin,i)
+		else
+			table.insert(self.DamageSkin,i)
+		end
+	end
 end
 
 function ENT:SetNextAltPrimary( delay )
@@ -297,7 +317,7 @@ function ENT:AltPrimaryAttack( Driver, Pod )
 	b.Size=0
 	b.Width=0
 	b.CustomDMG = true
-	b.Damage=2
+	b.Damage=10
 	b.Radius=70
 	b.sequential=true
 	b.npod=1
@@ -350,7 +370,8 @@ function ENT:AltPrimaryAttack1( Driver, Pod )
 	b.Caliber = "wac_base_7mm"
 	b.Size=0
 	b.Width=0
-	b.Damage=40
+	b.CustomDMG = true
+	b.Damage=10
 	b.Radius=70
 	b.sequential=true
 	b.npod=1
@@ -533,7 +554,8 @@ function ENT:PrimaryAttack()
 		b.Caliber = "wac_base_7mm"
 		b.Size=0
 		b.Width=0
-		b.Damage=40
+		b.CustomDMG = true
+		b.Damage=10
 		b.Radius=70
 		b.sequential=true
 		b.npod=1

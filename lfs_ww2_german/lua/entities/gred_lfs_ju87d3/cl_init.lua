@@ -74,9 +74,16 @@ end
 function ENT:CreateBones()
 	self.Bones = nil
 	timer.Simple(0,function()
+		if not self && IsValid(self) then return end
 		self.Bones = {}
+		local name
 		for i=0, self:GetBoneCount()-1 do
-			self.Bones[self:GetBoneName(i)] = i
+			name = self:GetBoneName(i)
+			if name == "__INVALIDBONE__" then
+				self.Bones = nil
+				break
+			end
+			self.Bones[name] = i
 		end
 	end)
 end
@@ -139,8 +146,8 @@ function ENT:AnimFins()
 	elseif
 		Pitch < 0 && Pitch < -90 then Pitch = -90
 	end
-	Pitch = Angle(0,0,-Pitch)
-	local Roll = Angle(0,-ang.r)
+	Pitch = Angle(-Pitch)
+	local Roll = Angle(0,-ang.r+90)
 	self:ManipulateBoneAngles(self.Bones.aviahorizon_roll,Roll+Pitch)
 	self:ManipulateBoneAngles(self.Bones.compass,Angle(0,ang.y))
 	self:ManipulateBoneAngles(self.Bones.compass1,Angle(ang.y))

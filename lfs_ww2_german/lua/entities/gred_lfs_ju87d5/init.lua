@@ -14,6 +14,53 @@ function ENT:SpawnFunction( ply, tr, ClassName ) -- called by garry
 	return ent
 end
 
+function ENT:HandleLandingGear()
+	local Driver = self:GetDriver()
+	
+	if IsValid( Driver ) then
+		local KeyJump = Driver:KeyDown( IN_JUMP )
+		
+		if self.OldKeyJump ~= KeyJump then
+			self.OldKeyJump = KeyJump
+			if KeyJump then
+				self:ToggleLandingGear()
+				self:PhysWake()
+			end
+		end
+	end
+	
+	local TValAuto = (self:GetStability() > 0.3) and 0 or 1
+	local TValManual = self.LandingGearUp and 0 or 1
+	
+	local TVal = self.WheelAutoRetract and TValAuto or TValManual
+	local Speed = FrameTime()
+	local Speed2 = Speed * math.abs( math.cos( math.rad( self:GetLGear() * 180 ) ) )
+	
+	self:SetLGear( self:GetLGear() + math.Clamp(TVal - self:GetLGear(),-Speed,Speed) )
+	self:SetRGear( self:GetRGear() + math.Clamp(TVal - self:GetRGear(),-Speed2,Speed2) )
+	
+	if IsValid( self.wheel_R ) then
+		local RWpObj = self.wheel_R:GetPhysicsObject()
+		if IsValid( RWpObj ) then
+			RWpObj:SetMass( 1 + (self.WheelMass - 1) * 1 ^ 5 )
+		end
+	end
+	
+	if IsValid( self.wheel_L ) then
+		local LWpObj = self.wheel_L:GetPhysicsObject()
+		if IsValid( LWpObj ) then
+			LWpObj:SetMass( 1 + (self.WheelMass - 1) * 1 ^ 5 )
+		end
+	end
+	
+	if IsValid( self.wheel_C ) then
+		local CWpObj = self.wheel_C:GetPhysicsObject()
+		if IsValid( CWpObj ) then
+			CWpObj:SetMass( 1 + (self.WheelMass - 1) * 1 )
+		end
+	end
+end
+
 function ENT:OnTick() -- use this instead of "think"
 	local hp = self:GetHP()
 	local skin = self:GetSkin()
@@ -743,7 +790,8 @@ function ENT:PrimaryAttack()
 		b.Caliber = "wac_base_20mm"
 		b.Size=0
 		b.Width=0
-		b.Damage=40
+		b.CustomDMG = true
+		b.Damage=60
 		b.Radius=70
 		b.sequential=true
 		b.npod=1
@@ -770,7 +818,6 @@ function ENT:PrimaryAttack()
 end
 
 function ENT:SecondaryAttack()
-	if self:GetAI() then return end
 	if not self:CanSecondaryAttack() then return end
 	local loadout = self:GetLoadout()
 	if loadout >= 6 then
@@ -792,7 +839,7 @@ function ENT:SecondaryAttack()
 				b.Width=0
 				self:TakeSecondaryAmmo()
 				b.CustomDMG=true
-				b.Damage=2
+				b.Damage=5
 				b.Radius=70
 				b.sequential=true
 				b.npod=1
@@ -833,7 +880,7 @@ function ENT:SecondaryAttack()
 				b.Width=0
 				self:TakeSecondaryAmmo()
 				b.CustomDMG=true
-				b.Damage=20
+				b.Damage=40
 				b.Radius=70
 				b.sequential=true
 				b.npod=1
@@ -858,6 +905,7 @@ function ENT:SecondaryAttack()
 			tracer = tracer + 1
 		end
 	else
+		if self:GetAI() then return end
 		self:SetNextSecondary( 0.1 )
 		self:TakeSecondaryAmmo()
 		local ammo = self:GetAmmoSecondary()

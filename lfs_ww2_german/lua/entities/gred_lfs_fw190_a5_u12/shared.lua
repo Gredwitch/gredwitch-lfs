@@ -46,17 +46,17 @@ ENT.MaxRPM 				= 2800 -- rpm at 100% throttle
 ENT.LimitRPM 			= 3000 -- max rpm when holding throttle key
 
 ENT.RotorPos 			= Vector(150,0,7.89529) -- make sure you set these correctly or your plane will act wierd
-ENT.WingPos 			= Vector(50,5,20) -- make sure you set these correctly or your plane will act wierd
-ENT.ElevatorPos 		= Vector(-150,5,20) -- make sure you set these correctly or your plane will act wierd
-ENT.RudderPos 			= Vector(-150,5,20) -- make sure you set these correctly or your plane will act wierd
+ENT.WingPos 			= Vector(43.2872,-2.60299,-8.27187) -- make sure you set these correctly or your plane will act wierd
+ENT.ElevatorPos 		= Vector(-218.529,0,30.7348	) -- make sure you set these correctly or your plane will act wierd
+ENT.RudderPos 			= Vector(-193.578,0,13.7062) -- make sure you set these correctly or your plane will act wierd
 
-ENT.MaxVelocity 		= 2400 -- max theoretical velocity at 0 degree climb
-ENT.MaxPerfVelocity 	= 2400 -- speed in which the plane will have its maximum turning potential
+ENT.MaxVelocity 		= 1500 -- max theoretical velocity at 0 degree climb
+ENT.MaxPerfVelocity 	= 1500 -- speed in which the plane will have its maximum turning potential
 
 ENT.MaxThrust 			= 850 -- max power of rotor
 
 
-ENT.MaxTurnPitch 		= 200
+ENT.MaxTurnPitch 		= 350
 ENT.MaxTurnYaw 			= 400
 ENT.MaxTurnRoll 		= 300
 
@@ -64,7 +64,7 @@ ENT.MaxHealth 			= 800
 --ENT.MaxShield 		= 200  -- uncomment this if you want to use deflector shields. Dont use excessive amounts because it regenerates.
 
 --ENT.Stability 		= 0.7   -- if you uncomment this the plane will always be able to turn at maximum performance. This causes MaxPerfVelocity to get ignored
-ENT.MaxStability 		= 0.7 -- lower this value if you encounter spazz. You can increase this up to 1 to aid turning performance at MaxPerfVelocity-speeds but be careful
+ENT.MaxStability 		= 0.4 -- lower this value if you encounter spazz. You can increase this up to 1 to aid turning performance at MaxPerfVelocity-speeds but be careful
 
 ENT.MaxSecondaryAmmo 	= 500 -- set to a positive number if you want to use weapons. set to -1 if you dont
 

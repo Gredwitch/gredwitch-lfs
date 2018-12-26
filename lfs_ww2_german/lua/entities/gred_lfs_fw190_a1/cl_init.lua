@@ -70,9 +70,16 @@ end
 function ENT:CreateBones()
 	self.Bones = nil
 	timer.Simple(0,function()
+		if not self && IsValid(self) then return end
 		self.Bones = {}
+		local name
 		for i=0, self:GetBoneCount()-1 do
-			self.Bones[self:GetBoneName(i)] = i
+			name = self:GetBoneName(i)
+			if name == "__INVALIDBONE__" then
+				self.Bones = nil
+				break
+			end
+			self.Bones[name] = i
 		end
 	end)
 end

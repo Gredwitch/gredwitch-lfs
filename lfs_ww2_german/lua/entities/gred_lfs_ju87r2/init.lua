@@ -14,6 +14,53 @@ function ENT:SpawnFunction( ply, tr, ClassName ) -- called by garry
 	return ent
 end
 
+function ENT:HandleLandingGear()
+	local Driver = self:GetDriver()
+	
+	if IsValid( Driver ) then
+		local KeyJump = Driver:KeyDown( IN_JUMP )
+		
+		if self.OldKeyJump ~= KeyJump then
+			self.OldKeyJump = KeyJump
+			if KeyJump then
+				self:ToggleLandingGear()
+				self:PhysWake()
+			end
+		end
+	end
+	
+	local TValAuto = (self:GetStability() > 0.3) and 0 or 1
+	local TValManual = self.LandingGearUp and 0 or 1
+	
+	local TVal = self.WheelAutoRetract and TValAuto or TValManual
+	local Speed = FrameTime()
+	local Speed2 = Speed * math.abs( math.cos( math.rad( self:GetLGear() * 180 ) ) )
+	
+	self:SetLGear( self:GetLGear() + math.Clamp(TVal - self:GetLGear(),-Speed,Speed) )
+	self:SetRGear( self:GetRGear() + math.Clamp(TVal - self:GetRGear(),-Speed2,Speed2) )
+	
+	if IsValid( self.wheel_R ) then
+		local RWpObj = self.wheel_R:GetPhysicsObject()
+		if IsValid( RWpObj ) then
+			RWpObj:SetMass( 1 + (self.WheelMass - 1) * 1 ^ 5 )
+		end
+	end
+	
+	if IsValid( self.wheel_L ) then
+		local LWpObj = self.wheel_L:GetPhysicsObject()
+		if IsValid( LWpObj ) then
+			LWpObj:SetMass( 1 + (self.WheelMass - 1) * 1 ^ 5 )
+		end
+	end
+	
+	if IsValid( self.wheel_C ) then
+		local CWpObj = self.wheel_C:GetPhysicsObject()
+		if IsValid( CWpObj ) then
+			CWpObj:SetMass( 1 + (self.WheelMass - 1) * 1 )
+		end
+	end
+end
+
 function ENT:OnTick() -- use this instead of "think"
 	local hp = self:GetHP()
 	if hp <= 350 then self:SetSkin(3) else self:SetSkin(2) end
@@ -152,7 +199,7 @@ function ENT:AltPrimaryAttack( Driver, Pod )
 	
 	self:SetNextAltPrimary( 0.057 )
 	
-	local MuzzlePos = self:LocalToWorld(Vector(-78.584,0,136) + EyeAngles:Right()*24)
+	local MuzzlePos = self:LocalToWorld(Vector(-78.584,0,136) + EyeAngles:Forward()*24)
 
 	local pos2=MuzzlePos
 	local num = 0.3
@@ -164,7 +211,8 @@ function ENT:AltPrimaryAttack( Driver, Pod )
 	b.Caliber = "wac_base_7mm"
 	b.Size=0
 	b.Width=0
-	b.Damage=40
+	b.CustomDMG = true
+	b.Damage=10
 	b.Radius=70
 	b.sequential=true
 	b.npod=1
@@ -310,7 +358,8 @@ function ENT:PrimaryAttack()
 		b.Caliber = "wac_base_7mm"
 		b.Size=0
 		b.Width=0
-		b.Damage=40
+		b.CustomDMG = true
+		b.Damage=10
 		b.Radius=70
 		b.sequential=true
 		b.npod=1

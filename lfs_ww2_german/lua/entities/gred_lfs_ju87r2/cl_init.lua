@@ -54,13 +54,13 @@ function ENT:CalcEngineSound( RPM, Pitch, Doppler )
 	if self.snd.siren_loop then
 		self.snd.siren_loop:ChangePitch(  math.Clamp( 60 + Pitch * speed/3.5 + Doppler/4,0,255) )
 		self.snd.siren_loop:ChangeVolume( speed > 130 and 1 or 0, 1.5 )
-		if speed > 130 then self.noSiren = false end
+		if speed > 170 then self.noSiren = false end
 	end
 	if self.snd.siren_stop then
 		if self.noSiren then return end
 		self.snd.siren_stop:ChangePitch(  math.Clamp( 60 + Pitch * speed/3.5 + Doppler/4,0,255) )
 		self.snd.siren_stop:ChangeVolume( speed < 90 and 1 or 0, 1.5 )
-		if speed < 130 then self.noSiren = true end
+		if speed < 170 then self.noSiren = true end
 	end
 end
 
@@ -90,9 +90,16 @@ end
 function ENT:CreateBones()
 	self.Bones = nil
 	timer.Simple(0,function()
+		if not self && IsValid(self) then return end
 		self.Bones = {}
+		local name
 		for i=0, self:GetBoneCount()-1 do
-			self.Bones[self:GetBoneName(i)] = i
+			name = self:GetBoneName(i)
+			if name == "__INVALIDBONE__" then
+				self.Bones = nil
+				break
+			end
+			self.Bones[name] = i
 		end
 	end)
 end
@@ -153,8 +160,8 @@ function ENT:AnimFins()
 	elseif
 		Pitch < 0 && Pitch < -90 then Pitch = -90
 	end
-	Pitch = Angle(0,0,-Pitch)
-	local Roll = Angle(0,-ang.r)
+	Pitch = Angle(-Pitch)
+	local Roll = Angle(0,-ang.r+90)
 	self:ManipulateBoneAngles(self.Bones.aviahorizon_roll,Roll+Pitch)
 	self:ManipulateBoneAngles(self.Bones.compass,Angle(0,ang.y))
 	self:ManipulateBoneAngles(self.Bones.compass1,Angle(ang.y))
