@@ -1,0 +1,6 @@
+{
+"title" : "[LFS] USAAF WWII Pack",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.ini", "*.svn*"]
+}

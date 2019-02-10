@@ -119,7 +119,7 @@ function ENT:SecondaryAttack()
 	local Ang = self:WorldToLocal( mpos ).y > 0 and -1 or 1
 	local ent = ents.Create(self.MISSILEENT)
 	ent:SetPos(mpos)
-	print(mpos)
+	
 	ent:SetAngles( self:LocalToWorldAngles( Angle(-2,Ang,0) ) )
 	ent.IsOnPlane = true
 	ent:SetOwner(self:GetDriver())

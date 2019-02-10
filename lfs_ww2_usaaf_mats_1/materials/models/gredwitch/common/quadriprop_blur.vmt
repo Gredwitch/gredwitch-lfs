@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture"  		"models/gredwitch/common/quadriprop_blur"
+	"$translucent" 1
+}
