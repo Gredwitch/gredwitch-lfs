@@ -153,15 +153,17 @@ function ENT:AltPrimaryAttack( Driver, Pod )
 				tracer = 0
 			end
 		else b.noTracer = true end
-		net.Start("gred_net_explosion_fx")
-			net.WriteString("muzzleflash_bar_3p")
-			net.WriteVector(pos2)
-			net.WriteAngle(ang)
-			net.WriteBool(false)
-		net.Broadcast()
+		local effectdata = EffectData()
+		effectdata:SetFlags(self.TURRETEFFECT)
+		effectdata:SetOrigin(pos2)
+		effectdata:SetAngles(ang)
+		effectdata:SetSurfaceProp(0)
+		util.Effect("gred_particle_simple",effectdata)
 	end
 	tracer = tracer + 1
 end
+
+ENT.TURRETEFFECT = table.KeyFromValue(gred.Particles,"muzzleflash_bar_3p")
 
 function ENT:HandleWeapons(Fire1, Fire2)
 	local Driver = self:GetDriver()
@@ -271,14 +273,16 @@ function ENT:PrimaryAttack()
 		b:SetSkin(0)
 		b:SetModelScale(20)
 		self:TakePrimaryAmmo()
-		net.Start("gred_net_explosion_fx")
-			net.WriteString("gred_arti_muzzle_blast")
-			net.WriteVector(pos2)
-			net.WriteAngle(ang)
-			net.WriteBool(false)
-		net.Broadcast()
+		local effectdata = EffectData()
+		effectdata:SetFlags(self.MUZZLEFFECT)
+		effectdata:SetOrigin(pos2)
+		effectdata:SetAngles(ang)
+		effectdata:SetSurfaceProp(0)
+		util.Effect("gred_particle_simple",effectdata)
 	end
 end
+
+ENT.MUZZLEFFECT = table.KeyFromValue(gred.Particles,"gred_arti_muzzle_blast")
 
 function ENT:SecondaryAttack()
 	if self:GetAI() then return end

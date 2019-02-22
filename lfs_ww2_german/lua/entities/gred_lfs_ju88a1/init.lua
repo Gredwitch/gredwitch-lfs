@@ -332,14 +332,16 @@ function ENT:AltPrimaryAttack( Driver, Pod )
 		b:SetModelScale(20)
 		tracer = 0
 	else b.noTracer = true end
-	net.Start("gred_net_explosion_fx")
-		net.WriteString("muzzleflash_bar_3p")
-		net.WriteVector(pos2)
-		net.WriteAngle(ang)
-		net.WriteBool(false)
-	net.Broadcast()
+	local effectdata = EffectData()
+	effectdata:SetFlags(self.MUZZLEEFFECT)
+	effectdata:SetOrigin(pos2)
+	effectdata:SetAngles(ang)
+	effectdata:SetSurfaceProp(0)
+	util.Effect("gred_particle_simple",effectdata)
 	tracer = tracer + 1
 end
+
+ENT.MUZZLEEFFECT = table.KeyFromValue(gred.Particles,"muzzleflash_bar_3p")
 
 function ENT:AltPrimaryAttack1( Driver, Pod )
 	if not self:CanAltPrimaryAttack1() then return end
@@ -386,12 +388,12 @@ function ENT:AltPrimaryAttack1( Driver, Pod )
 		b:SetModelScale(20)
 		tracer = 0
 	else b.noTracer = true end
-	net.Start("gred_net_explosion_fx")
-		net.WriteString("muzzleflash_bar_3p")
-		net.WriteVector(pos2)
-		net.WriteAngle(ang)
-		net.WriteBool(false)
-	net.Broadcast()
+	local effectdata = EffectData()
+	effectdata:SetFlags(self.MUZZLEEFFECT)
+	effectdata:SetOrigin(pos2)
+	effectdata:SetAngles(ang)
+	effectdata:SetSurfaceProp(0)
+	util.Effect("gred_particle_simple",effectdata)
 	tracer = tracer + 1
 end
 
@@ -573,10 +575,12 @@ function ENT:PrimaryAttack()
 			end
 		else b.noTracer = true end
 		self:TakePrimaryAmmo()
-		net.Start("gred_net_wac_mg_muzzle_fx")
-			net.WriteVector(pos2)
-			net.WriteAngle(ang)
-		net.Broadcast()
+
+		local effectdata = EffectData()
+		effectdata:SetOrigin(pos2)
+		effectdata:SetAngles(ang)
+		effectdata:SetEntity(self)
+		util.Effect("gred_particle_aircraft_muzzle",effectdata)
 	end
 	tracer = tracer + 1
 end

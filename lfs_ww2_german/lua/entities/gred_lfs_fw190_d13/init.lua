@@ -579,10 +579,12 @@ function ENT:PrimaryAttack()
 			end
 		else b.noTracer = true end
 		self:TakePrimaryAmmo()
-		net.Start("gred_net_wac_mg_muzzle_fx")
-			net.WriteVector(pos2)
-			net.WriteAngle(ang)
-		net.Broadcast()
+
+		local effectdata = EffectData()
+		effectdata:SetOrigin(pos2)
+		effectdata:SetAngles(ang)
+		effectdata:SetEntity(self)
+		util.Effect("gred_particle_aircraft_muzzle",effectdata)
 	end
 	tracer = tracer + 1
 end
@@ -627,10 +629,12 @@ function ENT:SecondaryAttack()
 			else b.noTracer = true end
 			self:TakeSecondaryAmmo()
 			tracerC = tracerC + 1
-			net.Start("gred_net_wac_mg_muzzle_fx")
-				net.WriteVector(pos2)
-				net.WriteAngle(ang)
-			net.Broadcast()
+
+			local effectdata = EffectData()
+			effectdata:SetOrigin(pos2)
+			effectdata:SetAngles(ang)
+			effectdata:SetEntity(self)
+			util.Effect("gred_particle_aircraft_muzzle",effectdata)
 		end
 	else
 		if self:GetAI() then return end
