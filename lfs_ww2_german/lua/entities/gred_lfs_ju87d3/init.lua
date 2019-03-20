@@ -670,6 +670,7 @@ function ENT:AltPrimaryAttack( Driver, Pod )
 		b:SetAngles(ang)
 		b.Speed=1000
 		b.Caliber = "wac_base_7mm"
+		b.col="Green"
 		b.Size=0
 		b.Width=0
 		b.CustomDMG = true
@@ -818,6 +819,7 @@ function ENT:PrimaryAttack()
 		b.Speed=1000
 		b.Caliber = "wac_base_7mm"
 		b.Size=0
+		b.col="Green"
 		b.Width=0
 		b.CustomDMG = true
 		b.Damage=10

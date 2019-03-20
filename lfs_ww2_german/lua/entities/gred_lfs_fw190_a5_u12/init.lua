@@ -365,7 +365,7 @@ function ENT:PrimaryAttack()
 		local b=ents.Create("gred_base_bullet")
 		b:SetPos(pos2)
 		b:SetAngles(ang)
-		b.col = "Yellow"
+		b.col = "Green"
 		b.Speed=1000
 		b.Caliber = "wac_base_7mm"
 		b.Size=0
@@ -442,7 +442,7 @@ function ENT:SecondaryAttack()
 			local b=ents.Create("gred_base_bullet")
 			b:SetPos(pos2)
 			b:SetAngles(ang)
-			b.col = "Yellow"
+			b.col = "Green"
 			b.Speed=1000
 			b.Caliber = "wac_base_12mm"
 			b.Size=0

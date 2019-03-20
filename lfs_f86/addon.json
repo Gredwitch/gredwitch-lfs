@@ -1,0 +1,6 @@
+{
+"title" : "[LFS] Destructible F-86 Sabre",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.ini", "*.svn*"]
+}

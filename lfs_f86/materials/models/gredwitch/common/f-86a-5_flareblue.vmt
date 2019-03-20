@@ -1,0 +1,8 @@
+"VertexLitGeneric"
+{
+	$basetexture 			"models/gredwitch/common/zflare_blue"
+	$halflambert			1
+	$nocull 				1
+	$translucent 			1
+	$color					"[0 0 255]"
+}
