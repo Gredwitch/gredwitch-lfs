@@ -5,6 +5,20 @@ include("shared.lua")
 ENT.EmitNow		= {}
 ENT.SoundQueue	= {}
 ENT.BumpSound	= nil
+
+function ENT:LFSHUDPaintFilter()
+	local partnum = {}
+	local a = 1
+	if self.Parts then
+		for k,v in pairs(self.Parts) do
+			partnum[a] = v
+			a = a + 1
+		end
+	end
+	partnum[a] = self
+	return partnum
+end
+
 function ENT:CalcEngineSound( RPM, Pitch, Doppler )
 	local Low = 500
 	local High = self.MaxRPM

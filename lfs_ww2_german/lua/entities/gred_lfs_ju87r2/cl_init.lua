@@ -53,14 +53,14 @@ function ENT:CalcEngineSound( RPM, Pitch, Doppler )
 	local speed = self:GetVelocity():Length()*0.09144 -- Speed in km/h
 	if self.snd.siren_loop then
 		self.snd.siren_loop:ChangePitch(  math.Clamp( 60 + Pitch * speed/3.5 + Doppler/4,0,255) )
-		self.snd.siren_loop:ChangeVolume( speed > 130 and 1 or 0, 1.5 )
-		if speed > 170 then self.noSiren = false end
+		self.snd.siren_loop:ChangeVolume( speed > 145 and 1 or 0, 1.5 )
+		if speed > 145 then self.noSiren = false end
 	end
 	if self.snd.siren_stop then
 		if self.noSiren then return end
 		self.snd.siren_stop:ChangePitch(  math.Clamp( 60 + Pitch * speed/3.5 + Doppler/4,0,255) )
-		self.snd.siren_stop:ChangeVolume( speed < 90 and 1 or 0, 1.5 )
-		if speed < 170 then self.noSiren = true end
+		self.snd.siren_stop:ChangeVolume( speed < 120 and 1 or 0, 1.5 )
+		if speed < 120 then self.noSiren = true end
 	end
 end
 

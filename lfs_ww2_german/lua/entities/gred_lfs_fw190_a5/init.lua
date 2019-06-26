@@ -2,6 +2,38 @@
 AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "cl_init.lua" )
 include("shared.lua")
+local tracer_cannon = 0
+local tracer_mgff = 0
+function ENT:UpdateTracers_MGFF()
+	tracer_mgff = tracer_mgff + 1
+	if tracer_mgff >= self.TracerConvar:GetInt() then
+		tracer_mgff = 0
+		return "white"
+	else
+		return false
+	end
+end
+function ENT:UpdateTracers_Cannon()
+	tracer_cannon = tracer_cannon + 1
+	if tracer_cannon >= self.TracerConvar:GetInt() then
+		tracer_cannon = 0
+		return "yellow"
+	else
+		return false
+	end
+end
+local tracer_mg17 = 0
+function ENT:UpdateTracers_MG17()
+	tracer_mg17 = tracer_mg17 + 1
+	if tracer_mg17 >= self.TracerConvar:GetInt() then
+		tracer_mg17 = 0
+		return "green"
+	else
+		return false
+	end
+end
+local Tracer_mgff = false
+local Tracer_cannon = false
 
 function ENT:SpawnFunction( ply, tr, ClassName ) -- called by garry
 	if not tr.Hit then return end
@@ -106,6 +138,7 @@ function ENT:RunOnSpawn()
 			table.insert(self.DamageSkin,i)
 		end
 	end
+	self.TracerConvar = GetConVar("gred_sv_tracers")
 end
 
 function ENT:HandleWeapons(Fire1, Fire2)
@@ -287,46 +320,17 @@ end
 
 function ENT:FireCannons()
 	local ct = CurTime()
+	local Driver = self:GetDriver()
 	for k,v in pairs (self.CannonPos) do
 		if ((k == 1 or k == 2) and self.NextCannon < ct and self:GetAmmoCannon() > 0) or 
 		   ((k == 3 or k == 4) and self.NextMGFF < ct and self:GetAmmoMGFF() > 0) then
 			local pos2=self:LocalToWorld(v)
 			local num = 1
 			local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-			local b=ents.Create("gred_base_bullet")
-			b:SetPos(pos2)
-			b:SetAngles(ang)
-			b.col = "Yellow"
-			b.Speed=1000
-			b.Caliber = "wac_base_20mm"
-			b.Size=0
-			b.Width=0
-			b.CustomDMG = true
-			if k >= 2 then
-				b.Damage=45
-			else
-				b.Damage=40
-			end
-			b.Radius=70
-			b.sequential=true
-			b.npod=1
-			b.gunRPM=750
-			b:Spawn()
-			b:Activate()
-			b.Filter = {self}
-			b.Owner=Driver
-			if !tracerC then tracerC = 0 end
-			if tracerC >= GetConVarNumber("gred_sv_tracers") then
-				b:SetSkin(0)
-				b:SetModelScale(20)
-				if k == 4 then
-					tracer = 0
-				end
-			else b.noTracer = true end
-			tracerC = tracerC + 1
-			if (k == 2) then self.NextCannon = ct + 0.08 self:TakeCannonAmmo(2) end
-			if (k == 4) then self.NextMGFF = ct + 0.11 self:TakeMGFFAmmo(2) end
-			
+			gred.CreateBullet(Driver,pos2,ang,"wac_base_20mm",{self},nil,false,k > 2 and Tracer_mgff or Tracer_cannon,k > 2 and 50 or 60)
+			if (k == 2) then self.NextCannon = ct + 0.08 self:TakeCannonAmmo(2) Tracer_cannon = self:UpdateTracers_Cannon() end
+			if (k == 4) then self.NextMGFF = ct + 0.11 self:TakeMGFFAmmo(2) Tracer_mgff = self:UpdateTracers_MGFF() end
+
 			local effectdata = EffectData()
 			effectdata:SetOrigin(pos2)
 			effectdata:SetAngles(ang)
@@ -351,36 +355,12 @@ function ENT:PrimaryAttack()
 	self:SetNextPrimary( 0.052 ) -- MG17 RPM
 	
 	local Driver = self:GetDriver()
+	local Tracer_MG17 = self:UpdateTracers_MG17()
 	for k,v in pairs (self.BulletPos) do
 		local pos2=self:LocalToWorld(v)
 		local num = 0.3
 		local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-		local b=ents.Create("gred_base_bullet")
-		b:SetPos(pos2)
-		b:SetAngles(ang)
-		b.col = "Green"
-		b.Speed=1000
-		b.Caliber = "wac_base_7mm"
-		b.Size=0
-		b.Width=0
-		b.CustomDMG=true
-		b.Damage=5
-		b.Radius=70
-		b.sequential=true
-		b.npod=1
-		b.gunRPM=750
-		b:Spawn()
-		b:Activate()
-		b.Filter = {self}
-		b.Owner=Driver
-		if !tracer then tracer = 0 end
-		if tracer >= GetConVarNumber("gred_sv_tracers") then
-			b:SetSkin(0)
-			b:SetModelScale(20)
-			if k == 2 then
-				tracer = 0
-			end
-		else b.noTracer = true end
+		gred.CreateBullet(Driver,pos2,ang,"wac_base_7mm",{self},nil,false,Tracer_MG17,20)
 		self:TakePrimaryAmmo()
 		
 		local effectdata = EffectData()
@@ -389,36 +369,7 @@ function ENT:PrimaryAttack()
 		effectdata:SetEntity(self)
 		util.Effect("gred_particle_aircraft_muzzle",effectdata)
 	end
-	tracer = tracer + 1
 end
-
---[[function ENT:SecondaryAttack()
-	if self:GetAI() then return end
-	if not self:CanSecondaryAttack() then return end
-	
-	self:SetNextSecondary( 0.1 )
-
-	self:TakeSecondaryAmmo()
-	
-	if istable( self.Bombs ) then
-		local bomb = self.Bombs[ self:GetAmmoSecondary() + 1 ]
-		bomb:EmitSound( "npc/waste_scanner/grenade_fire.wav" )
-		if IsValid( bomb ) then
-			bomb:SetParent(nil)
-			bomb.ShouldExplodeOnImpact = true
-			bomb:SetOwner(self:GetDriver())
-			local p = self:GetPhysicsObject() if IsValid(p) then bomb.phys:AddVelocity(p:GetVelocity()) end
-			timer.Simple(0.01,function() if IsValid(bomb.phys) then bomb.phys:SetMass(bomb.Mass)  end end)
-			timer.Simple(1, function()
-				if IsValid(bomb) and IsValid(bomb.phys) then
-					bomb.dropping=true
-					bomb.Armed=true
-					bomb:SetCollisionGroup(0)
-				end
-			end)
-		end
-	end
-end]]
 
 function ENT:SecondaryAttack()
 	-- if self:GetAI() then return end

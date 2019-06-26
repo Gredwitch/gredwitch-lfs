@@ -3,6 +3,24 @@ AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "cl_init.lua" )
 include("shared.lua")
 
+local Tracer_MG = false
+local tracer_mg = 0
+function ENT:UpdateTracers_MG()
+	return "white"
+end
+local Tracer_MG17_gunner = false
+local tracer_mg17_gunner = 0
+function ENT:UpdateTracers_MG17_gunner()
+	tracer_mg17_gunner = tracer_mg17_gunner + 1
+	if tracer_mg17_gunner >= self.TracerConvar:GetInt() then
+		tracer_mg17_gunner = 0
+		return "green"
+	else
+		return false
+	end
+end
+
+
 function ENT:SpawnFunction( ply, tr, ClassName ) -- called by garry
 	if not tr.Hit then return end
 
@@ -81,7 +99,9 @@ function ENT:OnTick() -- use this instead of "think"
 end
 
 function ENT:RunOnSpawn()
-	
+	self.TURRETEFFECT = table.KeyFromValue(gred.Particles,"muzzleflash_bar_3p")
+	self.MUZZLEEFFECT = table.KeyFromValue(gred.Particles,"gred_arti_muzzle_blast")
+	self.TracerConvar = GetConVar("gred_sv_tracers")
 	self:SetGunnerSeat(self:AddPassengerSeat(Vector(-69.0436,0,6),Angle(0,90,0)))
 	self.DamageSkin = {}
 	self.CleanSkin  = {}
@@ -122,38 +142,14 @@ function ENT:AltPrimaryAttack( Driver, Pod )
 	if AimDirToForwardDir > 45 then self.NoTurretSound = true return else self.NoTurretSound = false end
 	
 	self:SetNextAltPrimary( 0.057 )
+	Tracer_MG17_gunner = self:UpdateTracers_MG17_gunner()
 	for k,v in pairs(self.TurretMuzzle) do
 		local MuzzlePos = self:LocalToWorld(v + EyeAngles:Forward()*20)
 		
 		local pos2=MuzzlePos
 		local num = 0.3
 		local ang = (EyeAngles + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-		local b=ents.Create("gred_base_bullet")
-		b:SetPos(pos2)
-		b:SetAngles(ang)
-		b.Speed=1000
-		b.Caliber = "wac_base_7mm"
-		b.col="Green"
-		b.Size=0
-		b.Width=0
-		b.CustomDMG = true
-		b.Damage=10
-		b.Radius=70
-		b.sequential=true
-		b.npod=1
-		b.gunRPM=1050
-		b:Spawn()
-		b:Activate()
-		b.Filter = {self,self.Bombs}
-		b.Owner=Driver
-		if !tracer then tracer = 0 end
-		if tracer >= GetConVarNumber("gred_sv_tracers") then
-			b:SetSkin(3)
-			b:SetModelScale(20)
-			if k == 2 then
-				tracer = 0
-			end
-		else b.noTracer = true end
+		gred.CreateBullet(Driver,pos2,ang,"wac_base_7mm",{self},nil,false,Tracer_MG17_gunner,20)
 		local effectdata = EffectData()
 		effectdata:SetFlags(self.TURRETEFFECT)
 		effectdata:SetOrigin(pos2)
@@ -161,10 +157,7 @@ function ENT:AltPrimaryAttack( Driver, Pod )
 		effectdata:SetSurfaceProp(0)
 		util.Effect("gred_particle_simple",effectdata)
 	end
-	tracer = tracer + 1
 end
-
-ENT.TURRETEFFECT = table.KeyFromValue(gred.Particles,"muzzleflash_bar_3p")
 
 function ENT:HandleWeapons(Fire1, Fire2)
 	local Driver = self:GetDriver()
@@ -248,43 +241,23 @@ function ENT:PrimaryAttack()
 	self:SetNextPrimary( 0.375	)
 	self:EmitSound("JU87_BK37")
 	local Driver = self:GetDriver()
+	Tracer_mg = self:UpdateTracers_MG()
 	for k,v in pairs (self.BulletPos) do
 		local pos2=self:LocalToWorld(v)
 		local num = 0.3
 		local locaang = Angle(-0.5,(v.y > 0 and -1 or 1),0)
 		local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num))) + 
 		locaang
-		local b=ents.Create("gred_base_bullet")
-		b:SetPos(pos2)
-		b:SetAngles(ang)
-		b.Speed=1000
-		b.Caliber = "wac_base_40mm"
-		b.col="Yellow"
-		b.Size=0
-		b.Width=0
-		b.CustomDMG = true
-		b.Damage=307
-		b.Radius=50
-		b.sequential=true
-		b.npod=1
-		b.gunRPM=160
-		b:Spawn()
-		b:Activate()
-		b.Filter = {self}
-		b.Owner=Driver
-		b:SetSkin(0)
-		b:SetModelScale(20)
+		gred.CreateBullet(Driver,pos2,ang,"wac_base_40mm",{self},nil,false,Tracer_mg,307)
 		self:TakePrimaryAmmo()
 		local effectdata = EffectData()
-		effectdata:SetFlags(self.MUZZLEFFECT)
+		effectdata:SetFlags(self.MUZZLEEFFECT)
 		effectdata:SetOrigin(pos2)
 		effectdata:SetAngles(ang)
 		effectdata:SetSurfaceProp(0)
 		util.Effect("gred_particle_simple",effectdata)
 	end
 end
-
-ENT.MUZZLEFFECT = table.KeyFromValue(gred.Particles,"gred_arti_muzzle_blast")
 
 function ENT:SecondaryAttack()
 	if self:GetAI() then return end

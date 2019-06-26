@@ -1,0 +1,12 @@
+"VertexlitGeneric"
+{
+
+	"$basetexture" "models/gredwitch/ah64_lfs\black"
+	"$bumpmap" "models/gredwitch/ah64_lfs\black_n"
+
+
+	"$phong" "1"
+	"$phongexponenttexture" "models/gredwitch/ah64_lfs\black_n"
+	"$phongboost" "0.02"	
+	"$phongfresnelranges"	"[1 1 1]"
+}

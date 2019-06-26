@@ -33,17 +33,17 @@ ENT.WheelPos_C 		= 	Vector(-198.527,0,-21.96124)
 
 ENT.AITEAM 				= 1 -- 0 = FFA  1 = bad guys  2 = good guys
 
-ENT.Mass 				= 2000 -- lower this value if you encounter spazz
-ENT.Inertia 			= Vector(20000,20000,20000) -- you must increase this when you increase mass or it will spazz
-ENT.Drag 				= -40 -- drag is a good air brake but it will make diving speed worse
+ENT.Mass 				= 3000 -- lower this value if you encounter spazz
+ENT.Inertia 			= Vector(200000,200000,200000) -- you must increase this when you increase mass or it will spazz
+ENT.Drag 				= -20 -- drag is a good air brake but it will make diving speed worse
 
 --ENT.HideDriver 		= true -- hide the driver?
 ENT.SeatPos 			= Vector(0,-1.62,3.67)
 ENT.SeatAng 			= Angle(0,-90,0)
 
 ENT.IdleRPM 			= 300 -- idle rpm. this can be used to tweak the minimum flight speed
-ENT.MaxRPM 				= 2800 -- rpm at 100% throttle
-ENT.LimitRPM 			= 3000 -- max rpm when holding throttle key
+ENT.MaxRPM 				= 3000 -- rpm at 100% throttle
+ENT.LimitRPM 			= 3200 -- max rpm when holding throttle key
 
 ENT.RotorPos 			= Vector(150,0,7.89529) -- make sure you set these correctly or your plane will act wierd
 ENT.WingPos 			= Vector(43.2872,-2.60299,-8.27187) -- make sure you set these correctly or your plane will act wierd
@@ -56,9 +56,9 @@ ENT.MaxPerfVelocity 	= 1500 -- speed in which the plane will have its maximum tu
 ENT.MaxThrust 			= 850 -- max power of rotor
 
 
-ENT.MaxTurnPitch 		= 350
-ENT.MaxTurnYaw 			= 400
-ENT.MaxTurnRoll 		= 300
+ENT.MaxTurnPitch 		= 500
+ENT.MaxTurnYaw 			= 300
+ENT.MaxTurnRoll 		= 450
 
 ENT.MaxHealth 			= 800
 --ENT.MaxShield 		= 200  -- uncomment this if you want to use deflector shields. Dont use excessive amounts because it regenerates.

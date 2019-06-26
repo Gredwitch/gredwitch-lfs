@@ -28,6 +28,7 @@ function ENT:OnTick() -- use this instead of "think"
 		end
 	end
 	self.OldLoadout = loadout
+	self:SetBodygroup(1,1) -- Rocket tube
 	self:SetBodygroup(2,0) -- MG FF
 	self:SetBodygroup(3,0) -- 15mm R1
 	self:SetBodygroup(4,0) -- Bomb pylon
@@ -47,6 +48,7 @@ function ENT:RunOnSpawn()
 			table.insert(self.DamageSkin,i)
 		end
 	end
+	self.TracerConvar = GetConVar("gred_sv_tracers")
 end
 
 function ENT:HandleWeapons(Fire1, Fire2)
@@ -188,36 +190,12 @@ function ENT:PrimaryAttack()
 	self:SetNextPrimary( 0.052 ) -- MG17 RPM
 	
 	local Driver = self:GetDriver()
+	local Tracer_MG17 = self:UpdateTracers_MG17()
 	for k,v in pairs (self.BulletPos) do
 		local pos2=self:LocalToWorld(v)
 		local num = 0.3
 		local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-		local b=ents.Create("gred_base_bullet")
-		b:SetPos(pos2)
-		b:SetAngles(ang)
-		b.col = "Green"
-		b.Speed=1000
-		b.Caliber = "wac_base_7mm"
-		b.Size=0
-		b.Width=0
-		b.CustomDMG = true
-		b.Damage=5
-		b.Radius=70
-		b.sequential=true
-		b.npod=1
-		b.gunRPM=750
-		b:Spawn()
-		b:Activate()
-		b.Filter = {self}
-		b.Owner=Driver
-		if !tracer then tracer = 0 end
-		if tracer >= GetConVarNumber("gred_sv_tracers") then
-			b:SetSkin(0)
-			b:SetModelScale(20)
-			if k == 2 then
-				tracer = 0
-			end
-		else b.noTracer = true end
+		gred.CreateBullet(Driver,pos2,ang,"wac_base_7mm",{self},nil,false,Tracer_MG17,20)
 		self:TakePrimaryAmmo()
 
 		local effectdata = EffectData()
@@ -226,50 +204,32 @@ function ENT:PrimaryAttack()
 		effectdata:SetEntity(self)
 		util.Effect("gred_particle_aircraft_muzzle",effectdata)
 	end
-	tracer = tracer + 1
 end
+local tracer_mg17 = 0
+function ENT:UpdateTracers_MG17()
+	tracer_mg17 = tracer_mg17 + 1
+	if tracer_mg17 >= self.TracerConvar:GetInt() then
+		tracer_mg17 = 0
+		return "green"
+	else
+		return false
+	end
+end
+local Tracer_mgff = false
+local Tracer_cannon = false
 
 function ENT:SecondaryAttack()
 	local ct = CurTime()
+	local Driver = self:GetDriver()
 	for k,v in pairs (self.CannonPos) do
 		if ((k == 1 or k == 2) and self.NextCannon < ct and self:GetAmmoSecondary() > 0) or 
 		   ((k == 3 or k == 4) and self.NextMGFF < ct and self:GetAmmoMGFF() > 0) then
 			local pos2=self:LocalToWorld(v)
 			local num = 1
 			local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-			local b=ents.Create("gred_base_bullet")
-			b:SetPos(pos2)
-			b:SetAngles(ang)
-			b.col = "Yellow"
-			b.Speed=1000
-			b.Caliber = "wac_base_20mm"
-			b.Size=0
-			b.Width=0
-			b.CustomDMG = true
-			if k >= 2 then
-				b.Damage=20
-			else
-				b.Damage=10
-			end
-			b.Radius=70
-			b.sequential=true
-			b.npod=1
-			b.gunRPM=750
-			b:Spawn()
-			b:Activate()
-			b.Filter = {self}
-			b.Owner=Driver
-			if !tracerC then tracerC = 0 end
-			if tracerC >= GetConVarNumber("gred_sv_tracers") then
-				b:SetSkin(0)
-				b:SetModelScale(20)
-				if k == 4 then
-					tracer = 0
-				end
-			else b.noTracer = true end
-			tracerC = tracerC + 1
-			if (k == 2) then self.NextCannon = ct + 0.08 self:TakeSecondaryAmmo(2) end
-			if (k == 4) then self.NextMGFF = ct + 0.11 self:TakeMGFFAmmo(2) end
+			gred.CreateBullet(Driver,pos2,ang,"wac_base_20mm",{self},nil,false,k > 2 and Tracer_mgff or Tracer_cannon,k > 2 and 50 or 60)
+			if (k == 2) then self.NextCannon = ct + 0.08 self:TakeSecondaryAmmo(2) Tracer_cannon = self:UpdateTracers_Cannon() end
+			if (k == 4) then self.NextMGFF = ct + 0.11 self:TakeMGFFAmmo(2) Tracer_mgff = self:UpdateTracers_MGFF() end
 
 			local effectdata = EffectData()
 			effectdata:SetOrigin(pos2)
@@ -277,6 +237,28 @@ function ENT:SecondaryAttack()
 			effectdata:SetEntity(self)
 			util.Effect("gred_particle_aircraft_muzzle",effectdata)
 		end
+	end
+end
+
+
+local tracer_cannon = 0
+local tracer_mgff = 0
+function ENT:UpdateTracers_MGFF()
+	tracer_mgff = tracer_mgff + 1
+	if tracer_mgff >= self.TracerConvar:GetInt() then
+		tracer_mgff = 0
+		return "white"
+	else
+		return false
+	end
+end
+function ENT:UpdateTracers_Cannon()
+	tracer_cannon = tracer_cannon + 1
+	if tracer_cannon >= self.TracerConvar:GetInt() then
+		tracer_cannon = 0
+		return "yellow"
+	else
+		return false
 	end
 end
 

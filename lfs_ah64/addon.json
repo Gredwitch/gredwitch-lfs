@@ -1,0 +1,6 @@
+{
+"title" : "[LFS] Boeing AH-64D Apache",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.ini", "*.svn*"]
+}

@@ -34,30 +34,30 @@ ENT.WheelPos_C 		= 	Vector(-250.585,0,43.4815)
 ENT.AITEAM 				= 1 -- 0 = FFA  1 = bad guys  2 = good guys
 
 ENT.Mass 				= 7854  -- lower this value if you encounter spazz
-ENT.Inertia 			= Vector(500000,500000,500000) -- you must increase this when you increase mass or it will spazz
-ENT.Drag 				= -40 -- drag is a good air brake but it will make diving speed worse
+ENT.Inertia 			= Vector(900000,900000,900000) -- you must increase this when you increase mass or it will spazz
+ENT.Drag 				= 1 -- drag is a good air brake but it will make diving speed worse
 
 --ENT.HideDriver 		= true -- hide the driver?
 ENT.SeatPos 			= Vector(210,9,80)
 ENT.SeatAng 			= Angle(0,-90,0)
 
 ENT.IdleRPM 			= 300 -- idle rpm. this can be used to tweak the minimum flight speed
-ENT.MaxRPM 				= 2800 -- rpm at 100% throttle
-ENT.LimitRPM 			= 3000 -- max rpm when holding throttle key
+ENT.MaxRPM 				= 3000 -- rpm at 100% throttle
+ENT.LimitRPM 			= 3500 -- max rpm when holding throttle key
 
 ENT.RotorPos 			= Vector(106.8,0,73.35) -- make sure you set these correctly or your plane will act wierd
 ENT.WingPos 			= Vector(148.235,6.41604,77.7547) -- make sure you set these correctly or your plane will act wierd
 ENT.ElevatorPos 		= Vector(-282.785,0,104.629) -- make sure you set these correctly or your plane will act wierd
 ENT.RudderPos 			= Vector(-339.694,0,123.39) -- make sure you set these correctly or your plane will act wierd
 
-ENT.MaxVelocity 		= 1200 -- max theoretical velocity at 0 degree climb
-ENT.MaxPerfVelocity 	= 1200 -- speed in which the plane will have its maximum turning potential
+ENT.MaxVelocity 		= 2000 -- max theoretical velocity at 0 degree climb
+ENT.MaxPerfVelocity 	= 1500 -- speed in which the plane will have its maximum turning potential
 
 ENT.MaxThrust 			= 1500 -- max power of rotor
 
-ENT.MaxTurnPitch 		= 300 -- max turning force in pitch, lower this value if you encounter spazz
+ENT.MaxTurnPitch 		= 350 -- max turning force in pitch, lower this value if you encounter spazz
 ENT.MaxTurnYaw 			= 200 -- max turning force in yaw, lower this value if you encounter spazz
-ENT.MaxTurnRoll 		= 100 -- max turning force in roll, lower this value if you encounter spazz
+ENT.MaxTurnRoll 		= 150 -- max turning force in roll, lower this value if you encounter spazz
 
 ENT.MaxHealth 			= 1200
 --ENT.MaxShield 		= 200  -- uncomment this if you want to use deflector shields. Dont use excessive amounts because it regenerates.
@@ -145,6 +145,7 @@ function ENT:AddDataTables()
 	self:NetworkVar( "Int",13, "Loadout", { KeyName = "loadout", Edit = { type = "Int", order = 4,min = 0, max = self.Loadouts, category = "Weapons"} } )
 	self:NetworkVar( "Entity",11, "Gunter" )
 	self:NetworkVar( "Entity",12, "GunterSeat" )
+	self:NetworkVar( "Bool",11, "IsBombing" )
 	if SERVER then
 		self:SetLoadout(math.random(0,self.Loadouts))
 	end

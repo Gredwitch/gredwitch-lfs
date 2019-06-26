@@ -33,17 +33,17 @@ ENT.WheelPos_C 		= 	Vector(-295.121,0,-19.7179)
 
 ENT.AITEAM 				= 1 -- 0 = FFA  1 = bad guys  2 = good guys
 
-ENT.Mass 				= 2000 -- lower this value if you encounter spazz
-ENT.Inertia 			= Vector(20000,20000,20000) -- you must increase this when you increase mass or it will spazz
-ENT.Drag 				= -40 -- drag is a good air brake but it will make diving speed worse
+ENT.Mass 				= 6000 -- lower this value if you encounter spazz
+ENT.Inertia 			= Vector(90000,90000,90000) -- you must increase this when you increase mass or it will spazz
+ENT.Drag 				= 1 -- drag is a good air brake but it will make diving speed worse
 
 --ENT.HideDriver 		= true -- hide the driver?
 ENT.SeatPos 			= Vector(-22.7167,-2.3,11.7)
 ENT.SeatAng 			= Angle(0,-90,0)
 
 ENT.IdleRPM 			= 300 -- idle rpm. this can be used to tweak the minimum flight speed
-ENT.MaxRPM 				= 2800 -- rpm at 100% throttle
-ENT.LimitRPM 			= 3000 -- max rpm when holding throttle key
+ENT.MaxRPM 				= 3000 -- rpm at 100% throttle
+ENT.LimitRPM 			= 3500 -- max rpm when holding throttle key
 
 ENT.RotorPos 			= Vector(150.241,0,7.08415) -- make sure you set these correctly or your plane will act wierd
 ENT.WingPos 			= Vector(-2.32511,13.4984,-4.5694) -- make sure you set these correctly or your plane will act wierd
@@ -53,11 +53,11 @@ ENT.RudderPos 			= Vector(-317.832,0,39.1543) -- make sure you set these correct
 ENT.MaxVelocity 		= 1500 -- max theoretical velocity at 0 degree climb
 ENT.MaxPerfVelocity 	= 1500 -- speed in which the plane will have its maximum turning potential
 
-ENT.MaxThrust 			= 520 -- max power of rotor
+ENT.MaxThrust 			= 750 -- max power of rotor
 
-ENT.MaxTurnPitch 		= 300 -- max turning force in pitch, lower this value if you encounter spazz
+ENT.MaxTurnPitch 		= 500 -- max turning force in pitch, lower this value if you encounter spazz
 ENT.MaxTurnYaw 			= 100 -- max turning force in yaw, lower this value if you encounter spazz
-ENT.MaxTurnRoll 		= 150 -- max turning force in roll, lower this value if you encounter spazz
+ENT.MaxTurnRoll 		= 200 -- max turning force in roll, lower this value if you encounter spazz
 
 ENT.MaxHealth 			= 700
 --ENT.MaxShield 		= 200  -- uncomment this if you want to use deflector shields. Dont use excessive amounts because it regenerates.

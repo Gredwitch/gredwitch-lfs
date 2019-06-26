@@ -121,7 +121,7 @@ function ENT:AnimFins()
 	elseif
 		Pitch < 0 && Pitch < -90 then Pitch = -90
 	end
-	Pitch = Angle(0,0,-Pitch)
+	Pitch = Angle(0,0,Pitch)
 	local Roll = Angle(0,-ang.r)
 	self:ManipulateBoneAngles(24,Roll+Pitch) -- Horizon 1
 	self:ManipulateBoneAngles(25,Pitch+Roll) -- Horizon 2

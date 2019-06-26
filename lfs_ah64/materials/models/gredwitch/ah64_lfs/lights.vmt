@@ -1,0 +1,9 @@
+UnlitGeneric
+{
+
+$basetexture "models/gredwitch/ah64_lfs/lights"
+$alphatest 1
+$selfillum "1"
+$selfillummask" "models/gredwitch/ah64_lfs/lights_a"
+
+}

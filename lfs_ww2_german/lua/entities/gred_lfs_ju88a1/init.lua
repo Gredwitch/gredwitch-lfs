@@ -2,6 +2,39 @@
 AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "cl_init.lua" )
 include("shared.lua")
+local Tracer_MG17 = false
+local Tracer_MG17_gunner1 = false
+local Tracer_MG17_gunner2 = false
+local tracer_MG17 = 0
+local tracer_MG17_gunner1 = 0
+local tracer_MG17_gunner2 = 0
+function ENT:UpdateTracers_MG17()
+	tracer_MG17 = tracer_MG17 + 1
+	if tracer_MG17 >= self.TracerConvar:GetInt() then
+		tracer_MG17 = 0
+		return "green"
+	else
+		return false
+	end
+end
+function ENT:UpdateTracers_MG17_gunner2()
+	tracer_MG17_gunner2 = tracer_MG17_gunner2 + 1
+	if tracer_MG17_gunner2 >= self.TracerConvar:GetInt() then
+		tracer_MG17_gunner2 = 0
+		return "green"
+	else
+		return false
+	end
+end
+function ENT:UpdateTracers_MG17_gunner1()
+	tracer_MG17_gunner1 = tracer_MG17_gunner1 + 1
+	if tracer_MG17_gunner1 >= self.TracerConvar:GetInt() then
+		tracer_MG17_gunner1 = 0
+		return "green"
+	else
+		return false
+	end
+end
 
 function ENT:SpawnFunction( ply, tr, ClassName ) -- called by garry
 	if not tr.Hit then return end
@@ -15,6 +48,15 @@ function ENT:SpawnFunction( ply, tr, ClassName ) -- called by garry
 end
 
 function ENT:OnTick() -- use this instead of "think"
+	if not self.CurSeq then
+		self.CurSeq = self:GetSequenceName(self:GetSequence())
+	end
+	if self.CurSeq != "gearsup" then
+		self:ResetSequence("gearsup")
+		self.CurSeq = self:GetSequenceName(self:GetSequence())
+	end
+	self.SMLG = self.SMLG and self.SMLG + ((1 - self:GetLGear()) - self.SMLG) * FrameTime() * 2 or 0
+	self:SetCycle(self.SMLG)
 	local hp = self:GetHP()
 	local skin = self:GetSkin()
 	if hp <= 600 then
@@ -116,7 +158,9 @@ function ENT:OnTick() -- use this instead of "think"
 	self.OldLoadout = loadout
 	self.OldSecAmmo = ammo
 end
-
+ENT.MODEL_SC500 = "models/gredwitch/bombs/sc500.mdl"
+ENT.MODEL_SC250 = "models/gredwitch/bombs/sc250.mdl"
+ENT.MODEL_SC100 = "models/gredwitch/bombs/sc100.mdl"
 function ENT:AddBombs(n,b)
 	if self.Bombs then
 		for k,v in pairs (self.Bombs) do
@@ -133,17 +177,14 @@ function ENT:AddBombs(n,b)
 		if n == 3 then
 			for k,v in pairs(self.BOMBS) do
 				if k < 5 and (b && k <= b) then
-					local bomb = ents.Create("gb_bomb_sc250")
-					bomb.IsOnPlane = true
+					local bomb = ents.Create("prop_dynamic")
+					bomb:SetModel(self.MODEL_SC250)
+					bomb.class = "gb_bomb_sc250"
 					bomb:SetPos(self:LocalToWorld(v))
 					bomb:SetAngles(self:GetAngles())
 					bomb:Spawn()
 					bomb:Activate()
 					bomb:SetParent(self)
-					bomb.phys=bomb:GetPhysicsObject()
-					if !IsValid(bomb.phys) then return end
-					bomb.phys:SetMass(1)
-					bomb:SetCollisionGroup(20)
 					self:dOwner(bomb)
 					s = s + 1
 					table.insert( self.Bombs, bomb )
@@ -152,17 +193,14 @@ function ENT:AddBombs(n,b)
 		elseif n == 4 then
 			for k,v in pairs(self.BOMBS) do
 				if k < 3 and (b && k <= b) then
-					local bomb = ents.Create("gb_bomb_sc500")
-					bomb.IsOnPlane = true
+					local bomb = ents.Create("prop_dynamic")
+					bomb:SetModel(self.MODEL_SC500)
+					bomb.class = "gb_bomb_sc500"
 					bomb:SetPos(self:LocalToWorld(v))
 					bomb:SetAngles(self:GetAngles())
 					bomb:Spawn()
 					bomb:Activate()
 					bomb:SetParent(self)
-					bomb.phys=bomb:GetPhysicsObject()
-					if !IsValid(bomb.phys) then return end
-					bomb.phys:SetMass(1)
-					bomb:SetCollisionGroup(20)
 					self:dOwner(bomb)
 					s = s + 1
 					table.insert( self.Bombs, bomb )
@@ -172,32 +210,26 @@ function ENT:AddBombs(n,b)
 			for k,v in pairs(self.BOMBS) do
 				if (b && k <= b) or true then
 					if k < 3 then
-						local bomb = ents.Create("gb_bomb_sc250")
-						bomb.IsOnPlane = true
+						local bomb = ents.Create("prop_dynamic")
+						bomb:SetModel(self.MODEL_SC250)
+						bomb.class = "gb_bomb_sc250"
 						bomb:SetPos(self:LocalToWorld(v))
 						bomb:SetAngles(self:GetAngles())
 						bomb:Spawn()
 						bomb:Activate()
 						bomb:SetParent(self)
-						bomb.phys=bomb:GetPhysicsObject()
-						if !IsValid(bomb.phys) then return end
-						bomb.phys:SetMass(1)
-						bomb:SetCollisionGroup(20)
 						self:dOwner(bomb)
 						s = s + 1
 						table.insert( self.Bombs, bomb )
 					elseif k > 4 then
-						local bomb = ents.Create("gb_bomb_sc100")
-						bomb.IsOnPlane = true
+						local bomb = ents.Create("prop_dynamic")
+						bomb:SetModel(self.MODEL_SC100)
+						bomb.class = "gb_bomb_sc100"
 						bomb:SetPos(self:LocalToWorld(v))
 						bomb:SetAngles(self:GetAngles())
 						bomb:Spawn()
 						bomb:Activate()
 						bomb:SetParent(self)
-						bomb.phys=bomb:GetPhysicsObject()
-						if !IsValid(bomb.phys) then return end
-						bomb.phys:SetMass(1)
-						bomb:SetCollisionGroup(20)
 						self:dOwner(bomb)
 						s = s + 1
 						table.insert( self.Bombs, bomb )
@@ -208,17 +240,14 @@ function ENT:AddBombs(n,b)
 			for k,v in pairs(self.BOMBS) do
 				if (b && k <= b) or true then
 					if k > 4 then
-						local bomb = ents.Create("gb_bomb_sc100")
-						bomb.IsOnPlane = true
+						local bomb = ents.Create("prop_dynamic")
+						bomb:SetModel(self.MODEL_SC100)
+						bomb.class = "gb_bomb_sc100"
 						bomb:SetPos(self:LocalToWorld(v))
 						bomb:SetAngles(self:GetAngles())
 						bomb:Spawn()
 						bomb:Activate()
 						bomb:SetParent(self)
-						bomb.phys=bomb:GetPhysicsObject()
-						if !IsValid(bomb.phys) then return end
-						bomb.phys:SetMass(1)
-						bomb:SetCollisionGroup(20)
 						self:dOwner(bomb)
 						s = s + 1
 						table.insert( self.Bombs, bomb )
@@ -229,17 +258,14 @@ function ENT:AddBombs(n,b)
 			for k,v in pairs(self.BOMBS) do
 				if (b && k <= b) or true then
 					if k > 4 and k <= 14 then
-						local bomb = ents.Create("gb_bomb_sc100")
-						bomb.IsOnPlane = true
+						local bomb = ents.Create("prop_dynamic")
+						bomb:SetModel(self.MODEL_SC100)
+						bomb.class = "gb_bomb_sc100"
 						bomb:SetPos(self:LocalToWorld(v))
 						bomb:SetAngles(self:GetAngles())
 						bomb:Spawn()
 						bomb:Activate()
 						bomb:SetParent(self)
-						bomb.phys=bomb:GetPhysicsObject()
-						if !IsValid(bomb.phys) then return end
-						bomb.phys:SetMass(1)
-						bomb:SetCollisionGroup(20)
 						self:dOwner(bomb)
 						s = s + 1
 						table.insert( self.Bombs, bomb )
@@ -247,11 +273,15 @@ function ENT:AddBombs(n,b)
 				end
 			end
 		end
+		self.FILTER = {self,self.wheel_R,self.wheel_L,self.wheel_C}
+		for k,v in pairs(self.Bombs) do table.insert(self.FILTER,v) end
 		if not b then self:SetAmmoSecondary(s) else self:SetAmmoSecondary(b) end
 	end
 end
 
 function ENT:RunOnSpawn()
+	self.TracerConvar = GetConVar("gred_sv_tracers")
+	self.MUZZLEEFFECT = table.KeyFromValue(gred.Particles,"muzzleflash_bar_3p")
 	self:SetGunnerSeat(self:AddPassengerSeat(Vector(173.908,11.1736,85.4852),Angle(0,90,0)))
 	self:SetGunterSeat(self:AddPassengerSeat(Vector(200.354,-11.7944,69.0472),Angle(0,90,-130)))
 	self:AddBombs(self:GetLoadout())
@@ -280,6 +310,7 @@ function ENT:CanAltPrimaryAttack()
 	self.NextAltPrimary = self.NextAltPrimary or 0
 	return self.NextAltPrimary < CurTime()
 end
+
 function ENT:CanAltPrimaryAttack1()
 	self.NextAltPrimary1 = self.NextAltPrimary1 or 0
 	return self.NextAltPrimary1 < CurTime()
@@ -309,40 +340,15 @@ function ENT:AltPrimaryAttack( Driver, Pod )
 	local pos2=MuzzlePos
 	local num = 0.3
 	local ang = (EyeAngles + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-	local b=ents.Create("gred_base_bullet")
-	b:SetPos(pos2)
-	b:SetAngles(ang)
-	b.Speed=1000
-	b.Caliber = "wac_base_7mm"
-	b.Size=0
-	b.col="Green"
-	b.Width=0
-	b.CustomDMG = true
-	b.Damage=10
-	b.Radius=70
-	b.sequential=true
-	b.npod=1
-	b.gunRPM=1050
-	b:Spawn()
-	b:Activate()
-	b.Filter = {self,self.Bombs,self.wheel_R,self.wheel_L,self.wheel_C}
-	b.Owner=Driver
-	if !tracer then tracer = 0 end
-	if tracer >= GetConVarNumber("gred_sv_tracers") then
-		b:SetSkin(3)
-		b:SetModelScale(20)
-		tracer = 0
-	else b.noTracer = true end
+	local Tracer_MG17_gunner1 = self:UpdateTracers_MG17_gunner1()
+	gred.CreateBullet(Driver,pos2,ang,"wac_base_7mm",self.FILTER,nil,false,Tracer_MG17_gunner1,20)
 	local effectdata = EffectData()
 	effectdata:SetFlags(self.MUZZLEEFFECT)
 	effectdata:SetOrigin(pos2)
 	effectdata:SetAngles(ang)
 	effectdata:SetSurfaceProp(0)
 	util.Effect("gred_particle_simple",effectdata)
-	tracer = tracer + 1
 end
-
-ENT.MUZZLEEFFECT = table.KeyFromValue(gred.Particles,"muzzleflash_bar_3p")
 
 function ENT:AltPrimaryAttack1( Driver, Pod )
 	if not self:CanAltPrimaryAttack1() then return end
@@ -366,37 +372,14 @@ function ENT:AltPrimaryAttack1( Driver, Pod )
 	local pos2=MuzzlePos
 	local num = 0.3
 	local ang = (EyeAngles + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-	local b=ents.Create("gred_base_bullet")
-	b:SetPos(pos2)
-	b:SetAngles(ang)
-	b.Speed=1000
-	b.Caliber = "wac_base_7mm"
-	b.col="Green"
-	b.Size=0
-	b.Width=0
-	b.CustomDMG = true
-	b.Damage=10
-	b.Radius=70
-	b.sequential=true
-	b.npod=1
-	b.gunRPM=1050
-	b:Spawn()
-	b:Activate()
-	b.Filter = {self,self.Bombs,self.wheel_R,self.wheel_L,self.wheel_C}
-	b.Owner=Driver
-	if !tracer then tracer = 0 end
-	if tracer >= GetConVarNumber("gred_sv_tracers") then
-		b:SetSkin(3)
-		b:SetModelScale(20)
-		tracer = 0
-	else b.noTracer = true end
+	local Tracer_MG17_gunner2 = self:UpdateTracers_MG17_gunner2()
+	gred.CreateBullet(Driver,pos2,ang,"wac_base_7mm",self.FILTER,nil,false,Tracer_MG17_gunner2,20)
 	local effectdata = EffectData()
 	effectdata:SetFlags(self.MUZZLEEFFECT)
 	effectdata:SetOrigin(pos2)
 	effectdata:SetAngles(ang)
 	effectdata:SetSurfaceProp(0)
 	util.Effect("gred_particle_simple",effectdata)
-	tracer = tracer + 1
 end
 
 function ENT:HandleWeapons(Fire1, Fire2)
@@ -409,7 +392,7 @@ function ENT:HandleWeapons(Fire1, Fire2)
 	local TurretSnd1 = false
 	local FireTurret = false
 	local class = self:GetClass()
-	
+	local loadout = self:GetLoadout()
 	if IsValid( Driver ) then
 		if self:GetAmmoPrimary() > 0 then
 			Fire1 = Driver:KeyDown( IN_ATTACK )
@@ -534,12 +517,13 @@ function ENT:HandleWeapons(Fire1, Fire2)
 		end
 	end
 	
-	if self.OldFire2 ~= Fire2 then
+	-- if self.OldFire2 ~= Fire2 then
 		if Fire2 then
 			self:SecondaryAttack()
 		end
-		self.OldFire2 = Fire2
-	end
+		self:SetIsBombing(Fire2 and loadout < 3)
+		-- self.OldFire2 = Fire2
+	-- end
 end
 
 function ENT:PrimaryAttack()
@@ -551,32 +535,8 @@ function ENT:PrimaryAttack()
 		local pos2=self:LocalToWorld(v)
 		local num = 0.3
 		local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-		local b=ents.Create("gred_base_bullet")
-		b:SetPos(pos2)
-		b:SetAngles(ang)
-		b.Speed=1000
-		b.col="Green"
-		b.Caliber = "wac_base_7mm"
-		b.Size=0
-		b.Width=0
-		b.CustomDMG = true
-		b.Damage=10
-		b.Radius=70
-		b.sequential=true
-		b.npod=1
-		b.gunRPM=1150
-		b:Spawn()
-		b:Activate()
-		b.Filter = {self}
-		b.Owner=Driver
-		if !tracer then tracer = 0 end
-		if tracer >= GetConVarNumber("gred_sv_tracers") then
-			b:SetSkin(0)
-			b:SetModelScale(20)
-			if k == 2 then
-				tracer = 0
-			end
-		else b.noTracer = true end
+		local Tracer_MG17 = self:UpdateTracers_MG17()
+		gred.CreateBullet(Driver,pos2,ang,"wac_base_7mm",self.FILTER,nil,false,Tracer_MG17,20)
 		self:TakePrimaryAmmo()
 
 		local effectdata = EffectData()
@@ -585,31 +545,41 @@ function ENT:PrimaryAttack()
 		effectdata:SetEntity(self)
 		util.Effect("gred_particle_aircraft_muzzle",effectdata)
 	end
-	tracer = tracer + 1
 end
 
 function ENT:SecondaryAttack()
 	if self:GetAI() then return end
 	if not self:CanSecondaryAttack() then return end
 	
-	self:SetNextSecondary( 0.1 )
+	self:SetNextSecondary( 0.15 )
 
 	self:TakeSecondaryAmmo()
 	local ammo = self:GetAmmoSecondary()
 	if istable( self.Bombs ) then
-		local bomb = self.Bombs[ ammo + 1 ]
+		local oldbomb = self.Bombs[ammo + 1]
 		table.remove(self.Bombs,ammo + 1)
-		if IsValid( bomb ) then
-			bomb:EmitSound( "npc/waste_scanner/grenade_fire.wav" )
-			bomb:SetParent(nil)
+		if !IsValid(oldbomb) then return end
+		local class = oldbomb.class
+		local bomb = ents.Create(class)
+		bomb.IsOnPlane = true
+		bomb:SetPos(oldbomb:GetPos())
+		bomb:SetAngles(oldbomb:GetAngles())
+		bomb:Spawn()
+		bomb:Activate()
+		bomb:SetCollisionGroup(20)
+		self:dOwner(bomb)
+		bomb.phys = bomb:GetPhysicsObject()
+		oldbomb:Remove()
+		if IsValid(bomb) then
+			bomb:EmitSound("npc/waste_scanner/grenade_fire.wav")
 			bomb.ShouldExplodeOnImpact = true
 			bomb:SetOwner(self:GetDriver())
-			local p = self:GetPhysicsObject() if IsValid(p) then bomb.phys:AddVelocity(p:GetVelocity()) end
-			timer.Simple(0.01,function() if IsValid(bomb.phys) then bomb.phys:SetMass(bomb.Mass)  end end)
+			local p = self:GetPhysicsObject()
+			if IsValid(p) then bomb.phys:AddVelocity(p:GetVelocity()) end
 			timer.Simple(1, function()
-				if IsValid(bomb) and IsValid(bomb.phys) then
-					bomb.dropping=true
-					bomb.Armed=true
+				if IsValid(bomb) then
+					bomb.dropping = true
+					bomb.Armed = true
 					bomb:SetCollisionGroup(0)
 				end
 			end)

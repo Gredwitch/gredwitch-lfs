@@ -1,0 +1,18 @@
+vertexLitGeneric
+{
+	"$basetexture" "models/gredwitch/ah64_lfs/2body"
+	"$surfaceprop" "metal"
+	"$bumpmap"	"models/gredwitch/ah64_lfs/body_n"
+	"$phong" "1"
+	"$phongexponenttexture" "models/gredwitch/ah64_lfs/body_spec"
+	"$phongboost" "0.1"	
+	"$phongfresnelranges"	"[2 3 3]"
+	"$selfillum" 1
+
+	"$color2" "[ 1 1 1 ]"
+	"$ambientocclusion" "1"
+	"$detail" "models/gredwitch/ah64_lfs/body_detail"
+	"$detailscale" "1"
+	"$detailblendfactor" "1"
+	"$detailblendmode" "0"
+}

@@ -99,7 +99,7 @@ function ENT:RunOnSpawn() -- called when the vehicle is spawned
 	self.Parts.gear_r2.PartParent = self.Parts.wing_r
 	self.Parts.wheel_r.PartParent = self.Parts.gear_r2
 	
-	
+	self.TracerConvar = GetConVar("gred_sv_tracers")
 	self:CreateHVARs()
 	
 	self.LOADED = 1
@@ -234,8 +234,8 @@ function ENT:OnTick()
 				net.WriteEntity(self)
 				net.WriteString(k)
 			net.Broadcast()
-			table.remove(self.Parts,k)
-			table.remove(self.GibModels,k)
+			self.Parts[k] = nil
+			self.GibModels[k] = nil
 			k = nil
 		return end
 		local skin = self:GetSkin()
@@ -293,7 +293,8 @@ function ENT:OnTick()
 	self.SMLG = self.SMLG and self.SMLG + ((0 + self:GetLGear()) - self.SMLG) * FrameTime() * 2 or 0
 	self:SetCycle(self.SMLG)
 	
-	--------------------------------------------------------------------------------------------------------------
+	-------------------------------
+	
 	local loadout = self:GetLoadout()
 	local secAmmo = self:GetAmmoSecondary()
 	if loadout == 0 then
@@ -361,7 +362,108 @@ function ENT:OnTick()
 	self.OldSecAmmo = secAmmo
 	self.OldLoadout = loadout
 	
+	-------------------------------
+	--[[local vel
+	local Mass
+	local Stability
+	local PhysObj
+	local PhysObjValid
+	local addRoll
+	local addYaw
+	
+	if not self.Parts.wing_l then
+		vel = self:GetVelocity():Length()
+		addRoll = 0.2*vel
+		addYaw = vel*1.5
+	end
+	if not self.Parts.wing_r then
+		vel = vel or self:GetVelocity():Length()
+		addRoll = addRoll and addRoll*2 or 0.2*vel
+		addYaw = addYaw and addYaw + vel*1.5 or vel*1.5
+	end
+	
+	
+	if addYaw then 
+		PhysObj = self:GetPhysicsObject()
+		PhysObjValid = IsValid(PhysObj)
+		local MaxYaw = self:GetMaxTurnSpeed().y
+		local RudderVel = self:GetRudderVelocity()
+		if PhysObjValid then
+			Stability = self:GetStability()
+			Mass = PhysObj:GetMass()
+			PhysObj:ApplyForceOffset( -self:GetRudderUp() * (math.Clamp(RudderVel,-MaxYaw,MaxYaw) + -200 * Stability) *  Mass * Stability +Vector(0,addYaw), self:GetRudderPos() )
+		end
+	end
+	
+	if addRoll then
+		PhysObj = PhysObj or self:GetPhysicsObject()
+		PhysObjValid = PhysObjValid or IsValid(PhysObj)
+		if PhysObjValid then
+			Stability = Stability or self:GetStability()
+			Mass = Mass or PhysObj:GetMass()
+			self:ApplyAngForce( Angle(0,0,-self:GetAngVel().r * Stability + addRoll) *  Mass * 500 * Stability )
+		end
+	end
+	
+	if not self.Parts.aileron_l then
+		if not self.LeftAileronGone then
+			self.MaxTurnRoll = self.MaxTurnRoll / 2
+			self.LeftAileronGone = true
+		end
+		if self.RightAileronGone and self.LeftAileronGone then 
+			self.MaxTurnRoll = 0
+		end
+		Pitch = -500
+	end
+	
+	if not self.Parts.aileron_r then
+		if not self.RightAileronGone then
+			self.MaxTurnRoll = self.MaxTurnRoll / 2
+			self.RightAileronGone = true
+		end
+		if self.RightAileronGone and self.LeftAileronGone then 
+			self.MaxTurnRoll = 0
+		end
+	end
+	
+	if not self.Parts.elevator then
+		self.MaxTurnPitch = 0
+	end
+	if not self.Parts.rudder then
+		self.MaxTurnPitch = 0
+	end--]]
 end
+
+function ENT:CalcFlightOverride( Pitch, Yaw, Roll, Stability )
+
+	local addRoll = 0
+	local addYaw = 0
+	local vel = self:GetVelocity():Length()
+	if not self.Parts.wing_l then
+		addRoll = 0.3*vel
+		addYaw = vel*0.02
+	end
+	if not self.Parts.wing_r then
+		addRoll = !self.Parts.wing_l and addRoll or -0.3*vel
+		addYaw = !self.Parts.wing_l and addYaw - vel*0.09 or addYaw - vel*0.02
+	end
+	if not self.Parts.aileron_l then
+		if Roll < 0 then Roll = Roll/2 end
+	end
+	if not self.Parts.aileron_r then
+		if Roll > 0 then Roll = Roll/2 end
+	end
+	if not self.Parts.elevator then
+		Pitch = 0
+	end
+	if not self.Parts.rudder then
+		Yaw = 0
+	end
+	Roll = Roll + addRoll
+	Yaw = Yaw + addYaw
+	return Pitch,Yaw,Roll,Stability,Stability,Stability
+end
+
 
 function ENT:RemoveBombs()
 	if self.Bombs then
@@ -492,183 +594,20 @@ function ENT:AddBombs(n,b)
 		if not isnumber(b) then self:SetAmmoSecondary(s) end
 	end
 end
-
-function ENT:CalcFlight()
-	local MaxTurnSpeed = self:GetMaxTurnSpeed()
-	local MaxPitch = MaxTurnSpeed.p
-	local MaxYaw = MaxTurnSpeed.y
-	local MaxRoll = MaxTurnSpeed.r
-	
-	local IsInVtolMode =  self:IsVtolModeActive()
-	
-	local PhysObj = self:GetPhysicsObject()
-	if not IsValid( PhysObj ) then return end
-	
-	local Pod = self:GetDriverSeat()
-	if not IsValid( Pod ) then return end
-	
-	local Driver = Pod:GetDriver()
-	
-	local A = false
-	local D = false
-	local WingFinFadeOut = 1
-	local RudderFadeOut = 1
-	
-	local LocalAngPitch = 0
-	local LocalAngYaw = 0
-	local LocalAngRoll = 0
-	
-	if IsValid( Driver ) then 
-		local EyeAngles = Pod:WorldToLocalAngles( Driver:EyeAngles() )
-		
-		if Driver:KeyDown( IN_WALK ) then
-			if isangle( self.StoredEyeAngles ) then
-				EyeAngles = self.StoredEyeAngles
-			end
-		else
-			self.StoredEyeAngles = EyeAngles
-		end
-		
-		local LocalAngles = self:WorldToLocalAngles( EyeAngles )
-		
-		if Driver:KeyDown( IN_SPEED ) and not IsInVtolMode then
-			EyeAngles = self:GetAngles()
-			
-			self.StoredEyeAngles = Angle(EyeAngles.p,EyeAngles.y,0)
-			
-			LocalAngles = Angle(-90,0,0)
-		end
-		
-		LocalAngPitch = LocalAngles.p
-		LocalAngYaw = LocalAngles.y
-		LocalAngRoll = LocalAngles.r + math.cos(CurTime()) * 2
-		
-		local EyeAngForward = EyeAngles:Forward()
-		local Forward = self:GetForward()
-		
-		WingFinFadeOut = math.max((90 - math.deg( math.acos( math.Clamp( Forward:Dot(EyeAngForward) ,-1,1) ) ) ) / 90,0)
-		RudderFadeOut = math.max((60 - math.deg( math.acos( math.Clamp( Forward:Dot(EyeAngForward) ,-1,1) ) ) ) / 60,0)
-		
-		A = Driver:KeyDown( IN_MOVELEFT ) 
-		D = Driver:KeyDown( IN_MOVERIGHT )
-	else
-		if self:GetAI() then
-			local EyeAngles = self:RunAI()
-			local LocalAngles = self:WorldToLocalAngles( EyeAngles )
-			
-			LocalAngPitch = LocalAngles.p
-			LocalAngYaw = LocalAngles.y
-			LocalAngRoll = LocalAngles.r
-			
-			local EyeAngForward = EyeAngles:Forward()
-			
-			WingFinFadeOut = math.max((90 - math.deg( math.acos(   math.Clamp( self:GetForward():Dot(EyeAngForward) ,-1,1) ) ) ) / 90,0)
-			RudderFadeOut = math.max((60 - math.deg( math.acos(   math.Clamp( self:GetForward():Dot(EyeAngForward) ,-1,1) ) ) ) / 60,0)
-		end
-	end
-	
-	self:SteerWheel( LocalAngYaw )
-	
-	local Stability = self:GetStability()
-
-	local RollRate =  math.min(self:GetVelocity():Length() / math.min(self:GetMaxVelocity() * 0.5,3000),1)
-	RudderFadeOut = math.max(RudderFadeOut,1 - RollRate)
-	
-	local ManualRoll = (D and MaxRoll or 0) - (A and MaxRoll or 0)
-	
-	if IsInVtolMode then
-		ManualRoll = math.Clamp(((D and 25 or 0) - (A and 25 or 0) - self:GetAngles().r) * 5, -MaxRoll, MaxRoll)
-	end
-	
-	local AutoRoll = (-LocalAngYaw * 22 * RollRate + LocalAngRoll * 3.5 * RudderFadeOut) * WingFinFadeOut
-	
-	local Roll = math.Clamp( (not A and not D) and AutoRoll or ManualRoll,-MaxRoll ,MaxRoll )
-	local Yaw = math.Clamp(-LocalAngYaw * 160 * RudderFadeOut,-MaxYaw,MaxYaw)
-	local Pitch = math.Clamp(-LocalAngPitch * 25,-MaxPitch,MaxPitch)
-	
-	local WingVel = self:GetWingVelocity()
-	local ElevatorVel = self:GetElevatorVelocity()
-	local RudderVel = self:GetRudderVelocity()
-	local Mass = PhysObj:GetMass()
-	if not self.Parts.wing_l then 
-		PhysObj:ApplyForceOffset( -self:GetWingUp() * 100 *  Mass * Stability, self:GetWingPos() )
-	end
-	local addRoll = 0
-	local addYaw = 0
-	local vel = self:GetVelocity():Length()
-	if not self.Parts.wing_l then
-		addRoll = 0.1*vel
-		addYaw = vel
-	end
-	if not self.Parts.wing_r then
-		addRoll = addRoll - 0.2*vel
-		addYaw = addYaw - vel*1.01
-	end
-	if not self.Parts.aileron_l then
-		if Roll < 0 then Roll = Roll/2 end
-		Pitch = -500
-	end
-	if not self.Parts.aileron_r then
-		if Roll > 0 then Roll = Roll/2 end
-		Pitch = -500
-	end
-	if not self.Parts.elevator then
-		Pitch = 0
-	end
-	if not self.Parts.rudder then
-		Yaw = 0
-	end
-	self:ApplyAngForce( Angle(0,0,-self:GetAngVel().r + Roll * Stability + addRoll) *  Mass * 500 * Stability )
-	
-	PhysObj:ApplyForceOffset( -self:GetWingUp() * WingVel *  Mass * Stability, self:GetWingPos() )
-	
-	PhysObj:ApplyForceOffset( -self:GetElevatorUp() * (ElevatorVel + Pitch * Stability) * Mass * Stability, self:GetElevatorPos() )
-	
-	PhysObj:ApplyForceOffset( -self:GetRudderUp() * (math.Clamp(RudderVel,-MaxYaw,MaxYaw) + Yaw * Stability) *  Mass * Stability +Vector(0,addYaw), self:GetRudderPos() )
-    
-	if self:IsSpaceShip() then
-		PhysObj:ApplyForceCenter( self:GetRight() * self:WorldToLocal( self:GetPos() + self:GetVelocity() ).y * Mass * 0.01 )
-	end
-    
-	self:SetRotPitch( (Pitch / MaxPitch) * 30 )
-	self:SetRotYaw( (Yaw / MaxYaw) * 30 )
-	self:SetRotRoll( (Roll / MaxRoll) * 30 )
-end
-
+local tracer = 0
 function ENT:PrimaryAttack()
 	if not self:CanPrimaryAttack() then return end
 	self:SetNextPrimary( 0.05 )
 	
 	local Driver = self:GetDriver()
+	local Tracer = self:UpdateTracers()
+	local filter = {self}
+	for k,v in pairs(self.Parts) do table.insert(filter,v) end
 	for k,v in pairs(self.BulletPos) do
 		local pos2=self:LocalToWorld(v)
 		local num = 0.7
 		local ang = self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num))
-		local b=ents.Create("gred_base_bullet")
-		b:SetPos(pos2)
-		b:SetAngles(ang)
-		b.col = "Red"
-		b.Speed=1000
-		b.Caliber = "wac_base_12mm"
-		b.Size=0
-		b.Width=0
-		b.Damage=40
-		b.Radius=70
-		b.sequential=true
-		b.npod=1
-		b.gunRPM=3900
-		b.Filter = {self.Parts,self}
-		b:Spawn()
-		b:Activate()
-		b.Owner=Driver
-		if !tracer then tracer = 0 end
-		if tracer >= GetConVarNumber("gred_sv_tracers") then
-			b:SetSkin(1)
-			b:SetModelScale(20)
-			if k == 6 then
-				tracer = 0
-			end
-		else b.noTracer = true end
+		gred.CreateBullet(Driver,pos2,ang,"wac_base_12mm",filter,nil,false,Tracer)
 		self:TakePrimaryAmmo()
 		local effectdata = EffectData()
 		effectdata:SetOrigin(pos2)
@@ -676,7 +615,16 @@ function ENT:PrimaryAttack()
 		effectdata:SetEntity(self)
 		util.Effect("gred_particle_aircraft_muzzle",effectdata)
 	end
+end
+
+function ENT:UpdateTracers()
 	tracer = tracer + 1
+	if tracer >= self.TracerConvar:GetInt() then
+		tracer = 0
+		return "red"
+	else
+		return false
+	end
 end
 
 function ENT:SecondaryAttack()

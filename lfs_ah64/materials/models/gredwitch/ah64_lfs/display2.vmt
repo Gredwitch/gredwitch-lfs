@@ -1,0 +1,26 @@
+"unlitgeneric"
+
+
+{
+	"$basetexture" "models/gredwitch/ah64_lfs/display2"
+	"$selfillum" 1
+
+"Proxies"
+	
+{
+		
+"AnimatedTexture"
+		
+{
+			
+"animatedtexturevar" 
+"$basetexture"
+			"animatedtextureframenumvar" 
+"$frame"
+			"animatedtextureframerate" 30		
+}
+	
+}
+}
+
+}

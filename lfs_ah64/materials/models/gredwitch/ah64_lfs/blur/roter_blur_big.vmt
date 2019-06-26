@@ -1,0 +1,12 @@
+vertexLitGeneric
+{
+	"$basetexture" "models/gredwitch/ah64_lfs/blur/roter_blur_big"
+	"$translucent" 1
+"$bumpmap" "models/gredwitch/ah64_lfs/blur/roter_blur_big_n"
+
+
+"$phong" "1"
+	"$phongboost" "1"						
+	"$phongfresnelranges"	"[1 1 1]"	
+
+}

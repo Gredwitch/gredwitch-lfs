@@ -208,6 +208,19 @@ function ENT:AnimFins()
 		
 		self:ManipulateBoneAngles(self.Bones.mg_gunter, Angle(Yaw,0,Pitch))
 	end
+	local TVal = self:GetIsBombing() and 90 or 0
+	local Speed = FT*20
+	self.AnimHatch = self.AnimHatch and self.AnimHatch + math.Clamp(TVal - self.AnimHatch,-Speed,Speed) or 0
+	self:ManipulateBoneAngles(self.Bones.hatch1_fl,Angle(-self.AnimHatch))
+	self:ManipulateBoneAngles(self.Bones.hatch1_fr,Angle(self.AnimHatch))
+	self:ManipulateBoneAngles(self.Bones.hatch2_fl,Angle(self.AnimHatch))
+	self:ManipulateBoneAngles(self.Bones.hatch2_fr,Angle(-self.AnimHatch))
+	if self:GetLoadout() > 1 then
+		self:ManipulateBoneAngles(self.Bones.hatch1_bl,Angle(-self.AnimHatch))
+		self:ManipulateBoneAngles(self.Bones.hatch1_br,Angle(self.AnimHatch))
+		self:ManipulateBoneAngles(self.Bones.hatch2_bl,Angle(self.AnimHatch))
+		self:ManipulateBoneAngles(self.Bones.hatch2_br,Angle(-self.AnimHatch))
+	end
 end
 
 function ENT:AnimRotor()
@@ -227,17 +240,6 @@ function ENT:AnimRotor()
 end
 
 function ENT:AnimLandingGear()
-
-	if not self.CurSeq then
-		self.CurSeq = self:GetSequenceName(self:GetSequence())
-	end
-	if self.CurSeq != "gearsup" then
-		self:ResetSequence("gearsup")
-		self.CurSeq = self:GetSequenceName(self:GetSequence())
-	end
-	self.SMLG = self.SMLG and self.SMLG + ((1 - self:GetLGear()) - self.SMLG) * FrameTime() * 2 or 0
-	self.SMRG = self.SMRG and self.SMRG + ((1 - self:GetRGear()) - self.SMRG) * FrameTime() * 2 or 0
-	self:SetCycle(self.SMRG)
 	
 end
 

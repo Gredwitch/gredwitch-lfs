@@ -56,7 +56,7 @@ ENT.MaxPerfVelocity 	= 1500 -- speed in which the plane will have its maximum tu
 ENT.MaxThrust 			= 850 -- max power of rotor
 
 
-ENT.MaxTurnPitch 		= 350
+ENT.MaxTurnPitch 		= 500
 ENT.MaxTurnYaw 			= 400
 ENT.MaxTurnRoll 		= 300
 

@@ -17,8 +17,8 @@ ENT.GibModels = {}
 
 ENT.AITEAM 			= 	2 -- 0 = FFA  1 = bad guys  2 = good guys
 ENT.Parts 			=	{}
-ENT.Mass 			= 	1485 -- lower this value if you encounter spazz
-ENT.Inertia 		= 	Vector(40000,40000,40000) -- you must increase this when you increase mass or it will spazz
+ENT.Mass 			= 	6894 -- lower this value if you encounter spazz
+ENT.Inertia 		= 	Vector(500000,500000,500000) -- you must increase this when you increase mass or it will spazz
 ENT.Drag 			= 	30 -- drag is a good air brake but it will make diving speed worse
 
 ENT.SeatPos 		= 	Vector(137.83,0,48.4)
@@ -30,9 +30,9 @@ ENT.WheelPos_L 		= 	Vector(36.0389,-68.2915,-39.2766)
 ENT.WheelPos_R 		= 	Vector(36.0389,68.2915,-39.2766)
 ENT.WheelPos_C 		= 	Vector(224.812,0,-28.4728)
 
-ENT.IdleRPM 		= 	30 -- idle rpm. this can be used to tweak the minimum flight speed
-ENT.MaxRPM 			= 	3800 -- rpm at 100% throttle
-ENT.LimitRPM 		= 	4000 -- max rpm when holding throttle key
+ENT.IdleRPM 		= 	0 -- idle rpm. this can be used to tweak the minimum flight speed
+ENT.MaxRPM 			= 	3000 -- rpm at 100% throttle
+ENT.LimitRPM 		= 	3500 -- max rpm when holding throttle key
 
 ENT.RotorPos 		=	Vector(-207.592,0,36.7923)
 ENT.TailPos 		=	Vector(-60.237179,-0.451202,43.682617)
@@ -40,12 +40,12 @@ ENT.WingPos 		= 	Vector(10.4835,1,19.4119) -- make sure you set these correctly 
 ENT.ElevatorPos 	= 	Vector(-179.916,0,56.364) -- make sure you set these correctly or your plane will act wierd
 ENT.RudderPos		= 	Vector(-228.14,0,139.48) -- make sure you set these correctly or your plane will act wierd
 
-ENT.MaxVelocity 	= 	10000000 -- max theoretical velocity at 0 degree climb
+ENT.MaxVelocity 	= 	10000 -- max theoretical velocity at 0 degree climb
 ENT.MaxPerfVelocity = 	3000 -- speed in which the plane will have its maximum turning potential
 
-ENT.MaxThrust 		= 	15000 -- max power per rotor
+ENT.MaxThrust 		= 	8000 -- max power per rotor
 
-ENT.MaxTurnPitch 	= 	500 -- max turning force in pitch, lower this value if you encounter spazz
+ENT.MaxTurnPitch 	= 	550 -- max turning force in pitch, lower this value if you encounter spazz
 ENT.MaxTurnYaw 		= 	200 -- max turning force in yaw, lower this value if you encounter spazz
 ENT.MaxTurnRoll 	= 	600 -- max turning force in roll, lower this value if you encounter spazz
 

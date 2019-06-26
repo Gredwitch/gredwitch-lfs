@@ -2,6 +2,18 @@
 AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "cl_init.lua" )
 include("shared.lua")
+local Tracer_cannon = false
+local tracer_cannon = 0
+function ENT:UpdateTracers_Cannon()
+	tracer_cannon = tracer_cannon + 1
+	if tracer_cannon >= self.TracerConvar:GetInt() then
+		tracer_cannon = 0
+		return "yellow"
+	else
+		return false
+	end
+end
+
 
 function ENT:SpawnFunction( ply, tr, ClassName ) -- called by garry
 	if not tr.Hit then return end
@@ -129,6 +141,7 @@ end
 function ENT:RunOnSpawn()
 	Hidden = Color(255,255,255,0)
 	Shown = Color(255,255,255,255)
+	self.TracerConvar = GetConVar("gred_sv_tracers")
 	
 	self.DamageSkin = {}
 	self.CleanSkin  = {}
@@ -316,38 +329,13 @@ end
 function ENT:PrimaryAttack()
 	if not self:CanPrimaryAttack() then return end
 	self:SetNextPrimary( 0.08 ) -- MG17 RPM
-	
+	Tracer_cannon = self:UpdateTracers_Cannon()
 	local Driver = self:GetDriver()
 	for k,v in pairs (self.BulletPos) do
 		local pos2=self:LocalToWorld(v)
 		local num = 1
 		local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-		local b=ents.Create("gred_base_bullet")
-		b:SetPos(pos2)
-		b:SetAngles(ang)
-		b.col = "Yellow"
-		b.Speed=1000
-		b.Caliber = "wac_base_20mm"
-		b.Size=0
-		b.Width=0
-		b.CustomDMG = true
-		b.Damage=35
-		b.Radius=70
-		b.sequential=true
-		b.npod=1
-		b.gunRPM=750
-		b:Spawn()
-		b:Activate()
-		b.Filter = {self}
-		b.Owner=Driver
-		if !tracer then tracer = 0 end
-		if tracer >= GetConVarNumber("gred_sv_tracers") then
-			b:SetSkin(0)
-			b:SetModelScale(20)
-			if k == 2 then
-				tracer = 0
-			end
-		else b.noTracer = true end
+		gred.CreateBullet(Driver,pos2,ang,"wac_base_20mm",{self},nil,false,Tracer_cannon)
 		self:TakePrimaryAmmo()
 
 		local effectdata = EffectData()
@@ -356,7 +344,6 @@ function ENT:PrimaryAttack()
 		effectdata:SetEntity(self)
 		util.Effect("gred_particle_aircraft_muzzle",effectdata)
 	end
-	tracer = tracer + 1
 end
 
 function ENT:SecondaryAttack()

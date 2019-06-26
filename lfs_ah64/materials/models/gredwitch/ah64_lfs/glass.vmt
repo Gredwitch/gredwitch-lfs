@@ -1,0 +1,24 @@
+"VertexLitGeneric"
+{
+
+	"$basetexture" "models/gredwitch/ah64_lfs\glass2"
+	"$bumpmap" "models/gredwitch/ah64_lfs\glass_n"
+	"$halflambert" "1"				
+	"$nocull" 0
+                "$alphatest" 0
+$translucent "1"	
+
+				
+
+	"$phong" "1"						
+	"$phongwarptexture" "models/gredwitch/ah64_lfs\glass_w"
+	"$phongboost" "5"						
+	"$phongfresnelranges"	"[1 1 1]"	
+
+	"$PhongAlbedoTint" "0"		
+
+
+
+
+}
+
