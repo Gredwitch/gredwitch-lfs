@@ -68,7 +68,7 @@ end
 
 function ENT:Initialize()
 	self.snd = {}
-	self:CreateBones()
+	gred.UpdateBoneTable(self)
 end
 
 function ENT:CreateBones()
@@ -109,7 +109,7 @@ function ENT:SoundStop(keepSiren)
 end
 
 function ENT:AnimFins()
-	if not self.Bones then self:CreateBones() return end
+	if not self.Bones then gred.UpdateBoneTable(self) return end
 	
 	local FT = FrameTime() * 10
 	local Pitch = self:GetRotPitch()
@@ -120,37 +120,37 @@ function ENT:AnimFins()
 	self.smYaw = self.smYaw and self.smYaw + (Yaw - self.smYaw) * FT or 0
 	self.smRoll = self.smRoll and self.smRoll + (Roll - self.smRoll) * FT or 0
 	
-	self:ManipulateBoneAngles(self.Bones.stick_ailerons, Angle( 0,-self.smRoll/2,self.smPitch/-2) )
-	self:ManipulateBoneAngles(self.Bones.aileron_l, Angle( -self.smRoll,0,0) )
-	self:ManipulateBoneAngles(self.Bones.aileron_r, Angle( -self.smRoll,0,0) )
-	self:ManipulateBoneAngles(self.Bones.rudder, Angle( -self.smYaw ) )
-	self:ManipulateBoneAngles(self.Bones.pedal1, Angle( -self.smYaw/2) )
-	self:ManipulateBoneAngles(self.Bones.pedal2, Angle( self.smYaw/2) )
-	self:ManipulateBoneAngles(self.Bones.elevator, Angle( -self.smPitch) )
+	gred.ManipulateBoneAngles(self,"stick_ailerons",Angle( 0,-self.smRoll/2,self.smPitch/-2) )
+	gred.ManipulateBoneAngles(self,"aileron_l",Angle( -self.smRoll,0,0) )
+	gred.ManipulateBoneAngles(self,"aileron_r",Angle( -self.smRoll,0,0) )
+	gred.ManipulateBoneAngles(self,"rudder",Angle( -self.smYaw ) )
+	gred.ManipulateBoneAngles(self,"pedal1",Angle( -self.smYaw/2) )
+	gred.ManipulateBoneAngles(self,"pedal2",Angle( self.smYaw/2) )
+	gred.ManipulateBoneAngles(self,"elevator",Angle( -self.smPitch) )
 
 	
 	local METER_IN_UNIT = 0.01905
 	local FEET_IN_METER = 3.28084
 	local METER_IN_FEET = 3.281
 	speed_meters = (self:GetVelocity():Length()*METER_IN_UNIT)*-2 -- Speed in m/s
-	self:ManipulateBoneAngles(self.Bones.speed,Angle(0,speed_meters))
+	gred.ManipulateBoneAngles(self,"speed",Angle(0,speed_meters))
 	
 	local VertANG = Angle(0,self:GetVelocity().z/24)
-	self:ManipulateBoneAngles(self.Bones.vario,VertANG)
-	self:ManipulateBoneAngles(self.Bones.rpm,Angle(0,-self:GetRPM()/10)) -- RPM
+	gred.ManipulateBoneAngles(self,"vario",VertANG)
+	gred.ManipulateBoneAngles(self,"rpm",Angle(0,-self:GetRPM()/10)) -- RPM
 	
-	local ang = self:GetAngles()
-	local Pitch = -ang.p
+	local Ang = self:GetAngles()
+	local Pitch = -Ang.p
 	if Pitch > 0 && Pitch > 90 then
 		Pitch = 90 
 	elseif
 		Pitch < 0 && Pitch < -90 then Pitch = -90
 	end
 	Pitch = Angle(-Pitch)
-	local Roll = Angle(0,-ang.r+90)
-	self:ManipulateBoneAngles(self.Bones.aviahorizon_roll,Roll+Pitch)
-	self:ManipulateBoneAngles(self.Bones.compass,Angle(0,ang.y))
-	self:ManipulateBoneAngles(self.Bones.compass1,Angle(ang.y))
+	local Roll = Angle(0,-Ang.r+90)
+	gred.ManipulateBoneAngles(self,"aviahorizon_roll",Roll+Pitch)
+	gred.ManipulateBoneAngles(self,"compass",Angle(0,Ang.y))
+	gred.ManipulateBoneAngles(self,"compass1",Angle(Ang.y))
 
 	local trace = {
 		start = self:GetPos(),
@@ -162,19 +162,19 @@ function ENT:AnimFins()
 		self.altitude = trace.Fraction*10000
 	end
 	local alt = Angle(0,-self.altitude/7) -- Altitude in M
-	-- self:ManipulateBoneAngles(self.Bones.,alt)
+	-- gred.ManipulateBoneAngles(self,",alt)
 	
 	local s = Angle(0,os.date("%S"))
 	local m = Angle(0,os.date("%M")+(s.y*0.0166))
 	local h = Angle(0,os.date("%H")+(m.y*0.0166))
-	self:ManipulateBoneAngles(self.Bones.clock_hour,h*9)
-	self:ManipulateBoneAngles(self.Bones.clock_min,m*6)
-	self:ManipulateBoneAngles(self.Bones.clock_sec,s*6)
+	gred.ManipulateBoneAngles(self,"clock_hour",h*9)
+	gred.ManipulateBoneAngles(self,"clock_min",m*6)
+	gred.ManipulateBoneAngles(self,"clock_sec",s*6)
 	local Throttle = Angle(0,0,(math.max( math.Round( ((self:GetRPM() - self:GetIdleRPM()) / (self:GetMaxRPM() - self:GetIdleRPM())) * 100, 0) ,0)))
 	-- print(Throttle)
-	self:ManipulateBoneAngles(self.Bones.throttle,Throttle)
-	self:ManipulateBoneAngles(self.Bones.prop_pitch,Throttle)
-	self:ManipulateBoneAngles(self.Bones.manifold_pressure,Angle(0,-Throttle.r*1.5))
+	gred.ManipulateBoneAngles(self,"throttle",Throttle)
+	gred.ManipulateBoneAngles(self,"prop_pitch",Throttle)
+	gred.ManipulateBoneAngles(self,"manifold_pressure",Angle(0,-Throttle.r*1.5))
 	
 	---------------------------------------------
 	
@@ -193,18 +193,18 @@ function ENT:AnimFins()
 	local Yaw = math.Clamp( EyeAngles.y,-35,35)
 	local Pitch = math.Clamp( EyeAngles.p,-15,45 )
 	
-	if not Driver:KeyDown( IN_WALK ) and not HasGunner then
+	if not Driver:lfsGetInput("FREELOOK") and not HasGunner then
 		Yaw = 0
 		Pitch = 0
 	end
 	
-	self:ManipulateBoneAngles(self.Bones.turret, Angle(Yaw,0))
-	self:ManipulateBoneAngles(self.Bones.mg81z, Angle(-Pitch))
+	gred.ManipulateBoneAngles(self,"turret",Angle(Yaw,0))
+	gred.ManipulateBoneAngles(self,"mg81z",Angle(-Pitch))
 	
 end
 
 function ENT:AnimRotor()
-	if not self.Bones then self:CreateBones() return end
+	if not self.Bones then gred.UpdateBoneTable(self) return end
 	
 	local RPM = self:GetRPM()
 	local PhysRot = RPM < 700
@@ -213,14 +213,14 @@ function ENT:AnimRotor()
 	local Rot = Angle(0,self.RPM)
 	Rot:Normalize() 
 	
-	self:ManipulateBoneAngles( self.Bones.propeller, Rot )
+	gred.ManipulateBoneAngles(self,"propeller", Rot )
 	self:SetBodygroup(0, PhysRot and 0 or 1 ) 
 	-- self:SetBodygroup(1, PhysRot and 1 or 0 ) 
 	-- self:SetBodygroup(2, PhysRot and 0 or 1 ) 
 end
 
 function ENT:AnimCabin()
-	if not self.Bones then self:CreateBones() return end
+	if not self.Bones then gred.UpdateBoneTable(self) return end
 	
 	local bOn = self:GetActive()
 	
@@ -228,12 +228,12 @@ function ENT:AnimCabin()
 	local Speed = FrameTime() * 4
 	
 	self.SMcOpen = self.SMcOpen and self.SMcOpen + math.Clamp(TVal - self.SMcOpen,-Speed,Speed) or 0
-	self:ManipulateBonePosition(self.Bones.blister, Vector(0,-self.SMcOpen * 28,self.SMcOpen * 10))
+	gred.ManipulateBonePosition(self,"blister",Vector(0,-self.SMcOpen * 28,self.SMcOpen * 10))
 	
 end
 
 function ENT:AnimLandingGear()
-	if not self.Bones then self:CreateBones() return end
+	if not self.Bones then gred.UpdateBoneTable(self) return end
 	
 	--[[ function gets called each frame by the base script. you can do whatever you want here ]]--
 end

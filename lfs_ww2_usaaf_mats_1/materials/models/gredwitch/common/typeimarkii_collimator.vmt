@@ -1,7 +1,0 @@
-"VertexLitGeneric"
-{
-	$basetexture			"models/gredwitch/common/n9_collimator"
-	$halflambert			1
-	$nocull 				1
-	$alphatest 				1
-}

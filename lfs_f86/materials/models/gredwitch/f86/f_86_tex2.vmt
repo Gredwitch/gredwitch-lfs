@@ -3,7 +3,7 @@
 	$basetexture			"models/gredwitch/f86/f_86_tex2_c"
 	$bumpmap				"models/gredwitch/f86/f_86_tex2_n"
 	$halflambert			1
-	$nocull 				1
+	// $nocull 				1
 	$alphatest 				1
 
 	$phongexponenttexture 	"models/gredwitch/f86/f_86_tex2_n"

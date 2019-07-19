@@ -25,10 +25,18 @@ function ENT:SpawnFunction( ply, tr, ClassName )
 	if not tr.Hit then return end
 
 	local ent = ents.Create( ClassName )
-	ent:SetPos( tr.HitPos + tr.HitNormal * 40 )
+	ent:SetPos( tr.HitPos + tr.HitNormal * 60 )
 	ent:Spawn()
 	ent:Activate()
-
+	phy = ent:GetPhysicsObject()
+	if IsValid(phy) then
+		phy:EnableMotion(false)
+		timer.Simple(1,function()
+			if !IsValid(phy) then return end
+			phy:EnableMotion(true)
+			phy:Wake()
+		end)
+	end
 	return ent
 end
 
@@ -777,6 +785,7 @@ function ENT:UpdateTracers()
 		return false
 	end
 end
+
 function ENT:HandleWeapons(Fire1, Fire2)
 	local ct = CurTime()
 	local FireTurret

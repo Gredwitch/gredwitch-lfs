@@ -57,7 +57,7 @@ function ENT:Draw()
 	end
 end
 
-function ENT:RenderScreens(pos,ang,fov)
+function ENT:RenderScreens(pos,Ang,fov)
 	if !self:GetEngineActive() then self.Rt = nil return end
 	local att = self:GetAttachment(2)
 	local ang
@@ -456,7 +456,7 @@ end
 -----------------------------
 
 function ENT:AnimFins()
-	if not self.Bones then self:CreateBones() return end
+	if not self.Bones then gred.UpdateBoneTable(self) return end
 	local FT = FrameTime() * 10
 	local Pitch = self:GetRotPitch()
 	local Yaw = self:GetRotYaw()
@@ -472,31 +472,31 @@ function ENT:AnimFins()
 	self.smYaw = self.smYaw and self.smYaw + (Yaw - self.smYaw) * FT or 0
 	self.smRoll = self.smRoll and self.smRoll + (Roll - self.smRoll) * FT or 0
 	
-	local ang_pedal = Vector(0,0,self.smYaw*2)
-	self:ManipulateBonePosition(self.Bones.pilot_pedal_l,ang_pedal)
-	self:ManipulateBonePosition(self.Bones.pilot_pedal_r,-ang_pedal)
-	self:ManipulateBonePosition(self.Bones.gunner_pedal_l,ang_pedal)
-	self:ManipulateBonePosition(self.Bones.gunner_pedal_r,-ang_pedal)
+	local Ang_pedal = Vector(0,0,self.smYaw*2)
+	gred.ManipulateBonePosition(self,"pilot_pedal_l",Ang_pedal)
+	gred.ManipulateBonePosition(self,"pilot_pedal_r",-Ang_pedal)
+	gred.ManipulateBonePosition(self,"gunner_pedal_l",Ang_pedal)
+	gred.ManipulateBonePosition(self,"gunner_pedal_r",-Ang_pedal)
 	self.Tail = IsValid(self.Tail) and self.Tail or self:GetNWEntity("Tail")
 	if IsValid(self.Tail) then
-		local ang_elevator = Angle(0,0,self.smPitch*-20)
-		self.Tail:ManipulateBoneAngles(2,ang_elevator)
+		local Ang_elevator = Angle(0,0,self.smPitch*-20)
+		self.Tail:ManipulateBoneAngles(2,Ang_elevator)
 	else
 		self:RequestTail()
 	end
 	
-	local ang_stick = Angle(0,-self.smRoll*50,self.smPitch*10)
-	self:ManipulateBoneAngles(self.Bones.cockpit_pilot_stick,ang_stick)
-	self:ManipulateBoneAngles(self.Bones.gunner_stick,ang_stick)
+	local Ang_stick = Angle(0,-self.smRoll*50,self.smPitch*10)
+	gred.ManipulateBoneAngles(self,"cockpit_pilot_stick",Ang_stick)
+	gred.ManipulateBoneAngles(self,"gunner_stick",Ang_stick)
 	
 	local Throttle = (math.max(math.Round(((self:GetRPM() - self:GetIdleRPM()) / (self:GetMaxRPM() - self:GetIdleRPM())) * 100,0)))
-	local ang_throttle = Angle(0,0,-Throttle/8)
-	self:ManipulateBoneAngles(self.Bones.pilot_collective,ang_throttle)
-	self:ManipulateBoneAngles(self.Bones.gunner_collective,ang_throttle)
+	local Ang_throttle = Angle(0,0,-Throttle/8)
+	gred.ManipulateBoneAngles(self,"pilot_collective",Ang_throttle)
+	gred.ManipulateBoneAngles(self,"gunner_collective",Ang_throttle)
 	
 	
-	local ang_compass = Angle(-self:GetAngles().y+290) -- Made it like that so it matches the camera's compass
-	self:ManipulateBoneAngles(self.Bones.compass,ang_compass)
+	local Ang_compass = Angle(-self:GetAngles().y+290) -- Made it like that so it matches the camera's compass
+	gred.ManipulateBoneAngles(self,"compass",Ang_compass)
 	
 	self:SetBodygroup(1,self:GetEngineActive() and 1 or 0)
 	------------------------------
@@ -678,7 +678,7 @@ function ENT:AnimFins()
 end
 
 function ENT:AnimRotor()
-	if not self.Bones or not self.Bones.toprotor then self:CreateBones() return end
+	if not self.Bones or not self.Bones.toprotor then gred.UpdateBoneTable(self) return end
 	local RotorBlown = self:GetRotorDestroyed()
 
 	if RotorBlown ~= self.wasRotorBlown then
@@ -706,7 +706,7 @@ function ENT:AnimRotor()
 	
 	local Rot1 = Angle(-self.RPM)
 	Rot1:Normalize()
-	self:ManipulateBoneAngles(self.Bones.toprotor,Rot1)
+	gred.ManipulateBoneAngles(self,"toprotor",Rot1)
 	self.Tail = IsValid(self.Tail) and self.Tail or self:GetNWEntity("Tail")
 	if IsValid(self.Tail) then
 		if self.Tail.TailRotorDestroyed then
@@ -790,32 +790,6 @@ function ENT:Initialize()
 	self.snd["CANNON_CAM_LOOP"] = CreateSound(self,"M230_CAM")
 	self.snd["CANNON_CAM_STOP"] = CreateSound(self,"M230_CAM_STOP")
 	self.snd["BEEP_CRASH"] = CreateSound(self,"BEEP_CRASH")
-	self:CreateBones()
-	-- self:CreateCamera()
-end
-
-function ENT:CreateBones()
-	if self.CreatingBones then return end
-	self.Bones = nil
-	self.CreatingBones = true
-	timer.Simple(0.1,function()
-		if !IsValid(self) then return end
-		self:SetLOD(0)
-		self.Bones = {}
-		local name
-		for i=0,self:GetBoneCount()-1 do
-			name = self:GetBoneName(i)
-			if name != "__INVALIDBONE__" then
-				self.Bones[name] = i
-			elseif (name == "__INVALIDBONE__" and (i != 3 and i != 4 and i != 15)) then
-				self.Bones = nil
-				self:CreateBones()
-				break
-			end
-		end
-		self:SetLOD(-1)
-		self.CreatingBones = false
-	end)
 end
 
 function ENT:OnRemove()

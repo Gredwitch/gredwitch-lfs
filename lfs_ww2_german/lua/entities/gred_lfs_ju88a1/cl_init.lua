@@ -59,24 +59,7 @@ end
 
 function ENT:Initialize()
 	self.snd = {}
-	self:CreateBones()
-end
-
-function ENT:CreateBones()
-	self.Bones = nil
-	timer.Simple(0,function()
-		if not self && IsValid(self) then return end
-		self.Bones = {}
-		local name
-		for i=0, self:GetBoneCount()-1 do
-			name = self:GetBoneName(i)
-			if name == "__INVALIDBONE__" then
-				self.Bones = nil
-				break
-			end
-			self.Bones[name] = i
-		end
-	end)
+	gred.UpdateBoneTable(self)
 end
 
 function ENT:OnRemove()
@@ -100,7 +83,7 @@ function ENT:SoundStop(keepSiren)
 end
 
 function ENT:AnimFins()
-	if not self.Bones then self:CreateBones() return end
+	if not self.Bones then gred.UpdateBoneTable(self) return end
 	local FT = FrameTime() * 10
 	local Pitch = self:GetRotPitch()
 	local Yaw = self:GetRotYaw()
@@ -110,23 +93,23 @@ function ENT:AnimFins()
 	self.smYaw = self.smYaw and self.smYaw + (Yaw - self.smYaw) * FT or 0
 	self.smRoll = self.smRoll and self.smRoll + (Roll - self.smRoll) * FT or 0
 	
-	-- self:ManipulateBoneAngles(self.Bones.stick_ailerons, Angle( 0,-self.smRoll/2,self.smPitch/-2) )
-	self:ManipulateBoneAngles(self.Bones.aileron_l, Angle( -self.smRoll,0,0) )
-	self:ManipulateBoneAngles(self.Bones.aileron_r, Angle( -self.smRoll,0,0) )
-	self:ManipulateBoneAngles(self.Bones.rudder, Angle( -self.smYaw ) )
-	-- self:ManipulateBoneAngles(self.Bones.pedals1, Angle( self.smYaw/2) )
-	-- self:ManipulateBoneAngles(self.Bones.pedals2, Angle( self.smYaw/2) )
-	self:ManipulateBoneAngles(self.Bones.elevator, Angle( -self.smPitch) )
+	-- gred.ManipulateBoneAngles(self,"stick_ailerons",Angle( 0,-self.smRoll/2,self.smPitch/-2) )
+	gred.ManipulateBoneAngles(self,"aileron_l",Angle( -self.smRoll,0,0) )
+	gred.ManipulateBoneAngles(self,"aileron_r",Angle( -self.smRoll,0,0) )
+	gred.ManipulateBoneAngles(self,"rudder",Angle( -self.smYaw ) )
+	-- gred.ManipulateBoneAngles(self,"pedals1",Angle( self.smYaw/2) )
+	-- gred.ManipulateBoneAngles(self,"pedals2",Angle( self.smYaw/2) )
+	gred.ManipulateBoneAngles(self,"elevator",Angle( -self.smPitch) )
 
 	
 	local METER_IN_UNIT = 0.01905
 	local FEET_IN_METER = 3.28084
 	local METER_IN_FEET = 3.281
 	speed_meters = (self:GetVelocity():Length()*METER_IN_UNIT)*-2 -- Speed in m/s
-	self:ManipulateBoneAngles(self.Bones.speed,Angle(0,speed_meters))
+	gred.ManipulateBoneAngles(self,"speed",Angle(0,speed_meters))
 	
 	local VertANG = Angle(0,0,((self:GetVelocity().z/24)))
-	self:ManipulateBoneAngles(self.Bones.vario,VertANG)
+	gred.ManipulateBoneAngles(self,"vario",VertANG)
 	
 	local ang = self:GetAngles()
 	local Pitch = -ang.p
@@ -137,14 +120,14 @@ function ENT:AnimFins()
 	end
 	Pitch = Angle(-Pitch)
 	local Roll = Angle(0,-ang.r+90)
-	self:ManipulateBoneAngles(self.Bones.aviahorizon_pitch,Roll+Pitch)
-	self:ManipulateBoneAngles(self.Bones.compass,Angle(ang.y))
+	gred.ManipulateBoneAngles(self,"aviahorizon_pitch",Roll+Pitch)
+	gred.ManipulateBoneAngles(self,"compass",Angle(ang.y))
 
 	local r = ang.r
 	if r > 15 then r = 15 elseif r < -15 then r = -15 end
-	self:ManipulateBoneAngles(self.Bones.bank,Angle(0,r))
-	self:ManipulateBoneAngles(self.Bones.bank1,Angle(0,r))
-	self:ManipulateBoneAngles(self.Bones.turn,Angle(0,r))
+	gred.ManipulateBoneAngles(self,"bank",Angle(0,r))
+	gred.ManipulateBoneAngles(self,"bank1",Angle(0,r))
+	gred.ManipulateBoneAngles(self,"turn",Angle(0,r))
 	
 	local trace = {
 		start = self:GetPos(),
@@ -156,15 +139,15 @@ function ENT:AnimFins()
 		self.altitude = trace.Fraction*10000
 	end
 	local alt = Angle(0,-self.altitude/7) -- Altitude in M
-	self:ManipulateBoneAngles(self.Bones.altitude_min,alt)
+	gred.ManipulateBoneAngles(self,"altitude_min",alt)
 	local RPM = self:GetRPM()
 	local rpm = Angle(0,-RPM/10)
-	self:ManipulateBoneAngles(self.Bones.rpm,rpm) -- RPM
-	self:ManipulateBoneAngles(self.Bones.rpm1,rpm) -- RPM
+	gred.ManipulateBoneAngles(self,"rpm",rpm) -- RPM
+	gred.ManipulateBoneAngles(self,"rpm1",rpm) -- RPM
 	local Throttle = Angle(0,0,(math.max( math.Round( ((RPM - self:GetIdleRPM()) / (self:GetMaxRPM() - self:GetIdleRPM())) * 100, 0) ,0)))
 	-- print(Throttle)
-	self:ManipulateBoneAngles(self.Bones.manifold_pressure,Angle(0,-Throttle.r*1.5))
-	self:ManipulateBoneAngles(self.Bones.manifold_pressure1,Angle(0,-Throttle.r*1.5))
+	gred.ManipulateBoneAngles(self,"manifold_pressure",Angle(0,-Throttle.r*1.5))
+	gred.ManipulateBoneAngles(self,"manifold_pressure1",Angle(0,-Throttle.r*1.5))
 	
 	---------------------------------------------
 	
@@ -186,12 +169,12 @@ function ENT:AnimFins()
 		local Yaw = math.Clamp( EyeAngles.y,-45,45)
 		local Pitch = math.Clamp( EyeAngles.p,-5,45 )
 		
-		if not Driver:KeyDown( IN_WALK ) and not HasGunner then
+		if not Driver:lfsGetInput("FREELOOK") and not HasGunner then
 			Yaw = 0
 			Pitch = 0
 		end
 		
-		self:ManipulateBoneAngles(self.Bones.mg_rear, Angle(Yaw,0,Pitch))
+		gred.ManipulateBoneAngles(self,"mg_rear",Angle(Yaw,0,Pitch))
 	end
 	if DriverValid or HasGunter then
 		if HasGunter then Driver = Gunter end
@@ -201,30 +184,30 @@ function ENT:AnimFins()
 		
 		local Yaw = math.Clamp( EyeAngles.y,-45,45)
 		local Pitch = math.Clamp( EyeAngles.p,-45,5 )
-		if not Driver:KeyDown( IN_WALK ) and not HasGunter then
+		if not Driver:lfsGetInput("FREELOOK") and not HasGunter then
 			Yaw = 0
 			Pitch = 0
 		end
 		
-		self:ManipulateBoneAngles(self.Bones.mg_gunter, Angle(Yaw,0,Pitch))
+		gred.ManipulateBoneAngles(self,"mg_gunter",Angle(Yaw,0,Pitch))
 	end
 	local TVal = self:GetIsBombing() and 90 or 0
 	local Speed = FT*20
 	self.AnimHatch = self.AnimHatch and self.AnimHatch + math.Clamp(TVal - self.AnimHatch,-Speed,Speed) or 0
-	self:ManipulateBoneAngles(self.Bones.hatch1_fl,Angle(-self.AnimHatch))
-	self:ManipulateBoneAngles(self.Bones.hatch1_fr,Angle(self.AnimHatch))
-	self:ManipulateBoneAngles(self.Bones.hatch2_fl,Angle(self.AnimHatch))
-	self:ManipulateBoneAngles(self.Bones.hatch2_fr,Angle(-self.AnimHatch))
+	gred.ManipulateBoneAngles(self,"hatch1_fl",Angle(-self.AnimHatch))
+	gred.ManipulateBoneAngles(self,"hatch1_fr",Angle(self.AnimHatch))
+	gred.ManipulateBoneAngles(self,"hatch2_fl",Angle(self.AnimHatch))
+	gred.ManipulateBoneAngles(self,"hatch2_fr",Angle(-self.AnimHatch))
 	if self:GetLoadout() > 1 then
-		self:ManipulateBoneAngles(self.Bones.hatch1_bl,Angle(-self.AnimHatch))
-		self:ManipulateBoneAngles(self.Bones.hatch1_br,Angle(self.AnimHatch))
-		self:ManipulateBoneAngles(self.Bones.hatch2_bl,Angle(self.AnimHatch))
-		self:ManipulateBoneAngles(self.Bones.hatch2_br,Angle(-self.AnimHatch))
+		gred.ManipulateBoneAngles(self,"hatch1_bl",Angle(-self.AnimHatch))
+		gred.ManipulateBoneAngles(self,"hatch1_br",Angle(self.AnimHatch))
+		gred.ManipulateBoneAngles(self,"hatch2_bl",Angle(self.AnimHatch))
+		gred.ManipulateBoneAngles(self,"hatch2_br",Angle(-self.AnimHatch))
 	end
 end
 
 function ENT:AnimRotor()
-	if not self.Bones then self:CreateBones() return end
+	if not self.Bones then gred.UpdateBoneTable(self) return end
 	
 	local RPM = self:GetRPM()
 	local PhysRot = RPM < 700
@@ -233,8 +216,8 @@ function ENT:AnimRotor()
 	local Rot = Angle(0,self.RPM)
 	Rot:Normalize() 
 	
-	self:ManipulateBoneAngles( self.Bones.prop_l, Rot )
-	self:ManipulateBoneAngles( self.Bones.prop_r, Rot )
+	gred.ManipulateBoneAngles(self,"prop_l", Rot )
+	gred.ManipulateBoneAngles(self,"prop_r", Rot )
 	self:SetBodygroup(0, PhysRot and 0 or 1 ) 
 	self:SetBodygroup(1, PhysRot and 0 or 1 ) 
 end

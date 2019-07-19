@@ -13,12 +13,34 @@ function ENT:UpdateTracers_MG151()
 		return false
 	end
 end
+
+local tracer_mg151b = 0
+function ENT:UpdateTracers_MG151B()
+	tracer_mg151b = tracer_mg151b + 1
+	if tracer_mg151b >= self.TracerConvar:GetInt() then
+		tracer_mg151b = 0
+		return "white"
+	else
+		return false
+	end
+end
 local Tracer_MG17_gunner = false
 local tracer_mg17_gunner = 0
 function ENT:UpdateTracers_MG17_gunner()
 	tracer_mg17_gunner = tracer_mg17_gunner + 1
 	if tracer_mg17_gunner >= self.TracerConvar:GetInt() then
 		tracer_mg17_gunner = 0
+		return "green"
+	else
+		return false
+	end
+end
+
+local tracer_mg81 = 0
+function ENT:UpdateTracers_MG81()
+	tracer_mg81 = tracer_mg81 + 1
+	if tracer_mg81 >= self.TracerConvar:GetInt() then
+		tracer_mg81 = 0
 		return "green"
 	else
 		return false
@@ -673,7 +695,7 @@ function ENT:HandleWeapons(Fire1, Fire2)
 			Fire1 = Driver:KeyDown( IN_ATTACK )
 		end
 		
-		FireTurret = Driver:KeyDown( IN_WALK )
+		FireTurret = Driver:lfsGetInput("FREELOOK")
 		
 		if self:GetAmmoSecondary() > 0 then
 			Fire2 = Driver:KeyDown( IN_ATTACK2 )
@@ -802,38 +824,15 @@ function ENT:SecondaryAttack()
 		if loadout == 6 then --1500
 			self:SetNextSecondary( 0.04 )
 			local Driver = self:GetDriver()
+			local Tracer_MG81 = self:UpdateTracers_MG81()
 			for k,v in pairs (self.MG81Pos) do
 				local pos2=self:LocalToWorld(v)
 				local num = 0.3
 				local locaang = Angle(-0.5,(v.y > 0 and -1 or 1),0)
 				local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num))) + 
 				locaang
-				local b=ents.Create("gred_base_bullet")
-				b:SetPos(pos2)
-				b:SetAngles(ang)
-				b.Speed=1000
-				b.Caliber = "wac_base_7mm"
-				b.Size=0
-				b.Width=0
+				gred.CreateBullet(Driver,pos2,ang,"wac_base_7mm",{self},nil,false,Tracer_MG81,15)
 				self:TakeSecondaryAmmo()
-				b.CustomDMG=true
-				b.Damage=5
-				b.Radius=70
-				b.sequential=true
-				b.npod=1
-				b.gunRPM=1500
-				b:Spawn()
-				b:Activate()
-				b.Filter = {self}
-				b.Owner=Driver
-				if !tracer then tracer = 0 end
-				if tracer >= GetConVarNumber("gred_sv_tracers")*3 then
-					b:SetSkin(0)
-					b:SetModelScale(20)
-					if k == 12 then
-						tracer = 0
-					end
-				else b.noTracer = true end
 
 				local effectdata = EffectData()
 				effectdata:SetOrigin(pos2)
@@ -841,42 +840,18 @@ function ENT:SecondaryAttack()
 				effectdata:SetEntity(self)
 				util.Effect("gred_particle_aircraft_muzzle",effectdata)
 			end
-			tracer = tracer + 1
 		else
 			self:SetNextSecondary( 0.08 ) --750
 			local Driver = self:GetDriver()
+			local Tracer_MG151B = self:UpdateTracers_MG151B()
 			for k,v in pairs (self.MG151Pos) do
 				local pos2=self:LocalToWorld(v)
 				local num = 0.3
 				local locaang = Angle(-0.5,(v.y > 0 and -1 or 1),0)
 				local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num))) + 
 				locaang
-				local b=ents.Create("gred_base_bullet")
-				b:SetPos(pos2)
-				b:SetAngles(ang)
-				b.Speed=1000
-				b.Caliber = "wac_base_20mm"
-				b.Size=0
-				b.Width=0
+				gred.CreateBullet(Driver,pos2,ang,"wac_base_20mm",{self},nil,false,Tracer_MG151B,40)
 				self:TakeSecondaryAmmo()
-				b.CustomDMG=true
-				b.Damage=40
-				b.Radius=70
-				b.sequential=true
-				b.npod=1
-				b.gunRPM=750
-				b:Spawn()
-				b:Activate()
-				b.Filter = {self}
-				b.Owner=Driver
-				if !tracer then tracer = 0 end
-				if tracer >= GetConVarNumber("gred_sv_tracers") then
-					b:SetSkin(0)
-					b:SetModelScale(20)
-					if k == 4 then
-						tracer = 0
-					end
-				else b.noTracer = true end
 
 				local effectdata = EffectData()
 				effectdata:SetOrigin(pos2)
@@ -884,7 +859,6 @@ function ENT:SecondaryAttack()
 				effectdata:SetEntity(self)
 				util.Effect("gred_particle_aircraft_muzzle",effectdata)
 			end
-			tracer = tracer + 1
 		end
 	else
 		if self:GetAI() then return end

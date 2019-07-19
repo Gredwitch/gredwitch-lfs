@@ -340,8 +340,7 @@ function ENT:AltPrimaryAttack( Driver, Pod )
 	local pos2=MuzzlePos
 	local num = 0.3
 	local ang = (EyeAngles + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-	local Tracer_MG17_gunner1 = self:UpdateTracers_MG17_gunner1()
-	gred.CreateBullet(Driver,pos2,ang,"wac_base_7mm",self.FILTER,nil,false,Tracer_MG17_gunner1,20)
+	gred.CreateBullet(Driver,pos2,ang,"wac_base_7mm",self.FILTER,nil,false,self:UpdateTracers_MG17_gunner1(),20)
 	local effectdata = EffectData()
 	effectdata:SetFlags(self.MUZZLEEFFECT)
 	effectdata:SetOrigin(pos2)
@@ -372,8 +371,7 @@ function ENT:AltPrimaryAttack1( Driver, Pod )
 	local pos2=MuzzlePos
 	local num = 0.3
 	local ang = (EyeAngles + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-	local Tracer_MG17_gunner2 = self:UpdateTracers_MG17_gunner2()
-	gred.CreateBullet(Driver,pos2,ang,"wac_base_7mm",self.FILTER,nil,false,Tracer_MG17_gunner2,20)
+	gred.CreateBullet(Driver,pos2,ang,"wac_base_7mm",self.FILTER,nil,false,self:UpdateTracers_MG17_gunner2(),20)
 	local effectdata = EffectData()
 	effectdata:SetFlags(self.MUZZLEEFFECT)
 	effectdata:SetOrigin(pos2)
@@ -398,7 +396,7 @@ function ENT:HandleWeapons(Fire1, Fire2)
 			Fire1 = Driver:KeyDown( IN_ATTACK )
 		end
 		
-		FireTurret = Driver:KeyDown( IN_WALK )
+		FireTurret = Driver:lfsGetInput("FREELOOK")
 		
 		if self:GetAmmoSecondary() > 0 then
 			Fire2 = Driver:KeyDown( IN_ATTACK2 )

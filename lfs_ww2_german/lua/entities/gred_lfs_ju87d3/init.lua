@@ -711,7 +711,7 @@ function ENT:HandleWeapons(Fire1, Fire2)
 			Fire1 = Driver:KeyDown( IN_ATTACK )
 		end
 		
-		FireTurret = Driver:KeyDown( IN_WALK )
+		FireTurret = Driver:lfsGetInput("FREELOOK")
 		
 		if self:GetAmmoSecondary() > 0 then
 			Fire2 = Driver:KeyDown( IN_ATTACK2 )
