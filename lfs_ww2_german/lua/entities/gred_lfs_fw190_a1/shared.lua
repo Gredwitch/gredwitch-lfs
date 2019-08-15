@@ -50,7 +50,7 @@ ENT.WingPos 			= Vector(43.2872,-2.60299,-8.27187) -- make sure you set these co
 ENT.ElevatorPos 		= Vector(-218.529,0,30.7348	) -- make sure you set these correctly or your plane will act wierd
 ENT.RudderPos 			= Vector(-193.578,0,13.7062) -- make sure you set these correctly or your plane will act wierd
 
-ENT.MaxVelocity 		= 1500 -- max theoretical velocity at 0 degree climb
+ENT.MaxVelocity 		= 1800 -- max theoretical velocity at 0 degree climb
 ENT.MaxPerfVelocity 	= 1500 -- speed in which the plane will have its maximum turning potential
 
 ENT.MaxThrust 			= 850 -- max power of rotor
@@ -74,8 +74,46 @@ ENT.BulletPos[2]		= Vector(89.94,-5.63,30.58)
 ENT.BulletPos[3]		= Vector(97.1099,-42.0802,-15.886)
 ENT.BulletPos[4]		= Vector(97.1099,42.0802,-15.886)
 
-ENT.MaxPrimaryAmmo 		= 4000
+ENT.MaxPrimaryAmmo 		= 3800
 
 ENT.CannonPos			= {}
 ENT.CannonPos[1]		= Vector(83.8659,-106.278,-9.00239)
 ENT.CannonPos[2]		= Vector(83.8659,106.278,-9.00239)
+
+function ENT:GetCalcViewFilter(ent)
+	return not ent.ClassName == "gred_prop_part"
+end
+
+function ENT:GetPartModelPath(k)
+	return "models/gredwitch/fw190_lfs/fw190_"..k..".mdl"
+end
+
+ENT.PartParents = {
+	
+	gear_l2 	=	"gear_l3",
+	gear_l3 	=	"wing_l",
+	wheel_l 	=	"gear_l",
+	gear_l 		=	"wing_l",
+	gear_l4 	=	"wing_l",
+	aileron_l 	=	"wing_l",
+	flap_l 		=	"wing_l",
+	gear_11 	=	false,
+	
+	gear_r2 	=	"gear_r3",
+	gear_r3 	=	"wing_r",
+	wheel_r 	=	"gear_r",
+	gear_r 		=	"wing_r",
+	gear_r4 	=	"wing_r",
+	aileron_r 	=	"wing_r",
+	flap_r 		=	"wing_r",
+	gear_11 	=	false,
+	
+	wheel_c 	=	"gear_c",
+	gear_c 		=	"tail",
+	rudder 		=	"tail",
+	elevator	=	"tail",
+	
+	tail 		=	false,
+	wing_l 		=	false,
+	wing_r 		=	false,
+}

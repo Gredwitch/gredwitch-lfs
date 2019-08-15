@@ -68,8 +68,7 @@ function ENT:OnTick() -- use this instead of "think"
 	local skin = self:GetSkin()
 	local ammo = self:GetAmmoSecondary()
 	if hp <= 400 then
-		if table.HasValue(self.DamageSkin,skin) then return end
-		if table.HasValue(self.CleanSkin,skin) then
+		if !table.HasValue(self.DamageSkin,skin) and table.HasValue(self.CleanSkin,skin) then
 			self:SetSkin(skin + 1)
 		end
 	else
@@ -85,7 +84,6 @@ function ENT:OnTick() -- use this instead of "think"
 		self.Bombs = nil
 	end
 	
-	self:SetBodygroup(1,1)
 	if not self.Firing then
 		if loadout == 0 then -- Clean
 			if self.Bombs then
@@ -95,8 +93,7 @@ function ENT:OnTick() -- use this instead of "think"
 				self.Bombs = nil
 			end
 			self:SetAmmoSecondary(0)
-			self:SetBodygroup(4,0) -- Bomb pylon
-			self:SetBodygroup(3,0) -- Wing stuff
+			self:SetBodygroup(1,0) -- Bomb pylon
 		elseif loadout == 6 then -- 4xSC100
 			if not (self.OldLoadout == loadout) then
 				self:AddBombs(1)
@@ -108,8 +105,7 @@ function ENT:OnTick() -- use this instead of "think"
 			if ammo > 4 then
 				self:AddBombs(1,4)
 			end
-			self:SetBodygroup(3,0) -- Wing stuff
-			self:SetBodygroup(4,2) -- Bomb pylon
+			self:SetBodygroup(1,2) -- Bomb pylon
 		elseif loadout == 5 then  -- 8xSC100
 			if not (self.OldLoadout == loadout) then
 				self:AddBombs(1,8)
@@ -121,8 +117,7 @@ function ENT:OnTick() -- use this instead of "think"
 			if ammo > 8 then
 				self:AddBombs(1,8)
 			end
-			self:SetBodygroup(3,4) -- Wing stuff
-			self:SetBodygroup(4,2) -- Bomb pylon
+			self:SetBodygroup(1,1) -- Bomb pylon
 		elseif loadout == 4 then  -- 1xSC250
 			if not (self.OldLoadout == loadout) then
 				self:AddBombs(3)
@@ -131,11 +126,10 @@ function ENT:OnTick() -- use this instead of "think"
 					self:AddBombs(3,ammo)
 				end
 			end
+			self:SetBodygroup(1,1) -- Bomb pylon
 			if ammo > 1 then
 				self:AddBombs(3,1)
 			end
-			self:SetBodygroup(3,0) -- Wing stuff
-			self:SetBodygroup(4,1) -- Bomb pylon
 		elseif loadout == 3 then  -- 1xSC250 + 4xSC100
 			if not (self.OldLoadout == loadout) then
 				self:AddBombs(4,5)
@@ -147,8 +141,7 @@ function ENT:OnTick() -- use this instead of "think"
 			if ammo > 5 then
 				self:AddBombs(4,5)
 			end
-			self:SetBodygroup(3,4) -- Wing stuff
-			self:SetBodygroup(4,1) -- Bomb pylon
+			self:SetBodygroup(1,1) -- Bomb pylon
 		elseif loadout == 2 then  -- 1xSC500
 			if not (self.OldLoadout == loadout) then
 				self:AddBombs(5)
@@ -160,8 +153,7 @@ function ENT:OnTick() -- use this instead of "think"
 			if ammo > 1 then
 				self:AddBombs(5,1)
 			end
-			self:SetBodygroup(3,0) -- Wing stuff
-			self:SetBodygroup(4,1) -- Bomb pylon
+			self:SetBodygroup(1,1) -- Bomb pylon
 		elseif loadout == 1 then  -- 1xSC500 + 4xSC100
 			if not (self.OldLoadout == loadout) then
 				self:AddBombs(6,5)
@@ -173,16 +165,81 @@ function ENT:OnTick() -- use this instead of "think"
 			if ammo > 5 then
 				self:AddBombs(6,5)
 			end
-			self:SetBodygroup(3,4) -- Wing stuff
-			self:SetBodygroup(4,1) -- Bomb pylon
+			self:SetBodygroup(1,1) -- Bomb pylon
 		end
 	end
 	self.OldLoadout = loadout
 	self.OldSecAmmo = ammo
+	gred.HandleLandingGear(self,"gears")
+	gred.PartThink(self,skin)
+	self:SetBodygroup(2,0)
+	--[[
 	
-	self:SetBodygroup(2,1) -- MG FF
-	self:SetBodygroup(5,0) -- MG 17
-	self:SetBodygroup(6,0) -- MG 151 / MG 17
+		Bodygroup list
+		SELF :
+			1 : Undercarriage bomb pylons
+				0 : blank
+				1 : 1xbomb
+				2 : 4xbombs
+			2 : Nose guns
+				0 : MG 17s
+				1 : Nothing
+				2 : Mk 108
+				
+		WINGS :
+			1 : MG FF
+				0 : MG FF
+				1 : No MG FF
+			2 : Under wings stuff
+				0 : blank
+				1 : 210mm rockets
+				2 : 15mm MGs
+				3 : 30mm cannons
+				4 : R4M rockets
+				5 : bomb pylons
+	--]]
+	
+	local cannon = self:GetAmmoCannon()
+	local secAmmo = self:GetAmmoSecondary()
+	local val
+	if loadout == 1 or loadout == 3 or loadout == 5 then
+		val = 5
+	else
+		val = 0
+	end
+	if self.Parts.wing_l then
+		self.Parts.wing_l:SetBodygroup(1,1)
+		self.Parts.wing_l:SetBodygroup(2,val)
+	else
+		if !self.WING_L_UPDATED then
+			self.WING_L_UPDATED = true
+			self.CannonPos[2] = nil
+			self.AmmoCannon = self.WING_R_UPDATED and 0 or self.AmmoCannon / 2
+			cannon = self.WING_R_UPDATED and 0 or cannon / 2
+			self:SetAmmoCannon(cannon)
+			self.BOMBS[6] = nil
+			self.BOMBS[7] = nil
+		end
+	end
+	if self.Parts.wing_r then
+		self.Parts.wing_r:SetBodygroup(1,1)
+		self.Parts.wing_r:SetBodygroup(2,val)
+	else
+		if !self.WING_R_UPDATED then
+			self.WING_R_UPDATED = true
+			self.CannonPos[1] = nil
+			self.AmmoCannon = self.WING_L_UPDATED and 0 or self.AmmoCannon / 2
+			cannon = self.WING_L_UPDATED and 0 or cannon / 2
+			self:SetAmmoCannon(cannon)
+			self.BOMBS[8] = nil
+			self.BOMBS[9] = nil
+		end
+	end
+	if cannon > self.AmmoCannon then self:SetAmmoCannon(self.AmmoCannon) end
+end
+
+function ENT:CalcFlightOverride( Pitch, Yaw, Roll, Stability )
+	return gred.PartCalcFlight(self,Pitch,Yaw,Roll,Stability,1,0.2)
 end
 
 function ENT:RunOnSpawn()
@@ -210,6 +267,7 @@ function ENT:RunOnSpawn()
 	elseif loadout == 4 then
 		self:AddBombs(3)
 	end
+	gred.InitAircraftParts(self,600)
 end
 
 function ENT:AddBombs(n,b)
@@ -654,7 +712,7 @@ function ENT:FireCannons()
 		for k,v in pairs (self.CannonPos) do
 			local pos2 = self:LocalToWorld(v)
 			local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-			gred.CreateBullet(Driver,pos2,ang,"wac_base_20mm",{self},nil,false,Tracer_cannon)
+			gred.CreateBullet(Driver,pos2,ang,"wac_base_20mm",self.FILTER,nil,false,Tracer_cannon)
 			if (k == 2) then self.NextCannon = ct + 0.08 self:TakeCannonAmmo(2) end
 
 			local effectdata = EffectData()
@@ -671,13 +729,12 @@ function ENT:PrimaryAttack()
 	self:SetNextPrimary( 0.067 )
 	
 	local Driver = self:GetDriver()
-	print(self.ClassName,Driver)
 	local Tracer_MG13 = self:UpdateTracers_MG13()
 	for k,v in pairs (self.BulletPos) do
 		local pos2=self:LocalToWorld(v)
 		local num = 0.3
 		local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-		gred.CreateBullet(Driver,pos2,ang,"wac_base_12mm",{self},nil,false,Tracer_MG13,40)
+		gred.CreateBullet(Driver,pos2,ang,"wac_base_12mm",self.FILTER,nil,false,Tracer_MG13,40)
 		self:TakePrimaryAmmo()
 
 		local effectdata = EffectData()
@@ -702,7 +759,7 @@ function ENT:SecondaryAttack()
 			local locaang = Angle(-0.5,(v.y > 0 and -1 or 1),0)
 			local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num))) + 
 			locaang
-			gred.CreateBullet(Driver,pos2,ang,"wac_base_30mm",{self},nil,false,Tracer_Mk103,200)
+			gred.CreateBullet(Driver,pos2,ang,"wac_base_30mm",self.FILTER,nil,false,Tracer_Mk103,200)
 			self:TakeSecondaryAmmo()
 
 			local effectdata = EffectData()

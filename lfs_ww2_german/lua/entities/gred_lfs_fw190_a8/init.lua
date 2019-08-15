@@ -3,16 +3,6 @@ AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "cl_init.lua" )
 include("shared.lua")
 local tracer_cannon = 0
-local tracer_mgff = 0
-function ENT:UpdateTracers_MGFF()
-	tracer_mgff = tracer_mgff + 1
-	if tracer_mgff >= self.TracerConvar:GetInt() then
-		tracer_mgff = 0
-		return "white"
-	else
-		return false
-	end
-end
 function ENT:UpdateTracers_Cannon()
 	tracer_cannon = tracer_cannon + 1
 	if tracer_cannon >= self.TracerConvar:GetInt() then
@@ -32,7 +22,6 @@ function ENT:UpdateTracers_MG13()
 		return false
 	end
 end
-local Tracer_mgff = false
 local Tracer_mg13 = false
 local Tracer_cannon = false
 
@@ -51,8 +40,7 @@ function ENT:OnTick() -- use this instead of "think"
 	local hp = self:GetHP()
 	local skin = self:GetSkin()
 	if hp <= 400 then
-		if table.HasValue(self.DamageSkin,skin) then return end
-		if table.HasValue(self.CleanSkin,skin) then
+		if !table.HasValue(self.DamageSkin,skin) and table.HasValue(self.CleanSkin,skin) then
 			self:SetSkin(skin + 1)
 		end
 	else
@@ -62,22 +50,81 @@ function ENT:OnTick() -- use this instead of "think"
 	end
 	local loadout = self:GetLoadout()
 	if loadout == 1 then
-		if self.OldLoadout == loadout then
-			
-		else
+		if self.OldLoadout != loadout then
 			self:SetAmmoSecondary(2)
 		end
-		self:SetBodygroup(1,0)
 	else
 		self:SetAmmoSecondary(0)
-		self:SetBodygroup(1,1)
 	end
+	gred.HandleLandingGear(self,"gears")
+	gred.PartThink(self,skin)
 	self.OldLoadout = loadout
-	self:SetBodygroup(2,0) -- MG FF
-	self:SetBodygroup(3,0) -- 15mm R1
-	self:SetBodygroup(4,0) -- Bomb pylon
-	self:SetBodygroup(5,0) -- MG 17
-	self:SetBodygroup(6,0) -- MG 151 / MG 17
+	--[[
+	
+		Bodygroup list
+		SELF :
+			1 : Undercarriage bomb pylons
+				0 : blank
+				1 : 1xbomb
+				2 : 4xbombs
+			2 : Nose guns
+				0 : MG 17s
+				1 : Nothing
+				2 : Mk 108
+				
+		WINGS :
+			1 : MG FF
+				0 : MG FF
+				1 : No MG FF
+			2 : Under wings stuff
+				0 : blank
+				1 : 210mm rockets
+				2 : 15mm MGs
+				3 : 30mm cannons
+				4 : R4M rockets
+				5 : bomb pylons
+	--]]
+	
+	local cannon = self:GetAmmoCannon()
+	local secAmmo = self:GetAmmoSecondary()
+	if self.Parts.wing_l then
+		self.Parts.wing_l:SetBodygroup(1,0)
+		self.Parts.wing_l:SetBodygroup(2,loadout == 1 and 1 or 0)
+	else
+		if !self.WING_L_UPDATED then
+			self.WING_L_UPDATED = true
+			self.CannonPos[2] = nil
+			self.CannonPos[4] = nil
+			self.AmmoCannon = self.WING_R_UPDATED and 0 or self.AmmoCannon / 2
+			self.MaxSecondaryAmmo = self.WING_R_UPDATED and 0 or self.MaxSecondaryAmmo / 2
+			cannon = self.WING_R_UPDATED and 0 or cannon / 2
+			secAmmo = self.WING_R_UPDATED and 0 or secAmmo / 2
+			self.MISSILES[1][2] = nil
+			self:SetAmmoCannon(cannon)
+		end
+	end
+	if self.Parts.wing_r then
+		self.Parts.wing_r:SetBodygroup(1,0)
+		self.Parts.wing_r:SetBodygroup(2,loadout == 1 and 1 or 0)
+	else
+		if !self.WING_R_UPDATED then
+			self.WING_R_UPDATED = true
+			self.CannonPos[1] = nil
+			self.CannonPos[3] = nil
+			self.AmmoCannon = self.WING_L_UPDATED and 0 or self.AmmoCannon / 2
+			self.MaxSecondaryAmmo = self.WING_L_UPDATED and 0 or self.MaxSecondaryAmmo / 2
+			cannon = self.WING_L_UPDATED and 0 or cannon / 2
+			secAmmo = self.WING_L_UPDATED and 0 or secAmmo / 2
+			self.MISSILES[1][1] = nil
+			self:SetAmmoCannon(cannon)
+		end
+	end
+	if cannon > self.AmmoCannon then self:SetAmmoCannon(self.AmmoCannon) end
+	if secAmmo > self.MaxSecondaryAmmo then self:SetAmmoSecondary(self.MaxSecondaryAmmo) end
+end
+
+function ENT:CalcFlightOverride( Pitch, Yaw, Roll, Stability )
+	return gred.PartCalcFlight(self,Pitch,Yaw,Roll,Stability,1,0.2)
 end
 
 function ENT:RunOnSpawn()
@@ -140,6 +187,7 @@ function ENT:RunOnSpawn()
 			table.insert(self.DamageSkin,i)
 		end
 	end
+	gred.InitAircraftParts(self,600)
 end
 
 function ENT:HandleWeapons(Fire1, Fire2)
@@ -154,7 +202,6 @@ function ENT:HandleWeapons(Fire1, Fire2)
 		end
 	end
 	local pri = self:GetAmmoPrimary()
-	local mgff = self:GetAmmoMGFF()
 	local cannon = self:GetAmmoCannon()
 	if Fire1 then
 		if pri > 0 then
@@ -165,12 +212,6 @@ function ENT:HandleWeapons(Fire1, Fire2)
 			PRISnd = false
 		end
 		self:FireCannons()
-		if mgff > 0 then
-			stopmgff = false
-			MGFFSnd = true
-		else
-			MGFFSnd = false
-		end
 		if cannon > 0 then
 			stopcannon = false
 			CannonSnd = true
@@ -195,23 +236,6 @@ function ENT:HandleWeapons(Fire1, Fire2)
 				self:CallOnRemove( "stopmesounds1", function( ent )
 					if ent.wpn1 then
 						ent.wpn1:Stop()
-					end
-				end)
-			end
-			if MGFFSnd then
-				if mgff > 0 then
-					self.wpn2 = CreateSound( self, "BF109_FIRE2_LOOP" )
-					self.wpn2:Play()
-				else
-					if self.wpn2 then
-						self.wpn2:Stop()
-					end
-					self.wpn2 = nil
-					self:EmitSound( "BF109_FIRE2_LASTSHOT" )
-				end
-				self:CallOnRemove( "stopmesounds2", function( ent )
-					if ent.wpn2 then
-						ent.wpn2:Stop()
 					end
 				end)
 			end
@@ -250,9 +274,6 @@ function ENT:HandleWeapons(Fire1, Fire2)
 				if PRISnd then
 					self:EmitSound( "BF109_FIRE_LASTSHOT" )
 				end
-				if MGFFSnd then
-					self:EmitSound( "FW190_FIRE_LASTSHOT" )
-				end
 				if CannonSnd then
 					self:EmitSound( "FW190_FIRE_LASTSHOT" )
 				end
@@ -269,16 +290,6 @@ function ENT:HandleWeapons(Fire1, Fire2)
 		if !stoppri then
 			self:EmitSound( "BF109_FIRE_LASTSHOT" )
 			stoppri = true
-		end
-	end
-	if !(mgff > 0) then
-		if self.wpn2 then
-			self.wpn2:Stop()
-		end
-		self.wpn2 = nil
-		if !stopmgff then
-			self:EmitSound( "FW190_FIRE_LASTSHOT" )
-			stopmgff = true
 		end
 	end
 	if !(cannon > 0) then
@@ -311,27 +322,20 @@ function ENT:HandleWeapons(Fire1, Fire2)
 	end
 end
 
-function ENT:GetMaxAmmoMGFF()
-	return self.AmmoMGFF
-end
-
 function ENT:GetMaxAmmoCannon()
 	return self.AmmoCannon
 end
 
 function ENT:FireCannons()
 	local ct = CurTime()
+	if self.NextCannon > ct then return end
 	local Driver = self:GetDriver()
 	for k,v in pairs (self.CannonPos) do
-		if ((k == 1 or k == 2) and self.NextCannon < ct and self:GetAmmoCannon() > 0) or 
-		   ((k == 3 or k == 4) and self.NextMGFF < ct and self:GetAmmoMGFF() > 0) then
+		if self:GetAmmoCannon() > 0 then
 			local pos2=self:LocalToWorld(v)
 			local num = 1
 			local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-			gred.CreateBullet(Driver,pos2,ang,"wac_base_20mm",{self},nil,false,k > 2 and Tracer_mgff or Tracer_cannon,k > 2 and 50 or 60)
-			if (k == 2) then self.NextCannon = ct + 0.08 self:TakeCannonAmmo(2) Tracer_cannon = self:UpdateTracers_Cannon() end
-			if (k == 4) then self.NextMGFF = ct + 0.11 self:TakeMGFFAmmo(2) Tracer_mgff = self:UpdateTracers_MGFF() end
-
+			gred.CreateBullet(Driver,pos2,ang,"wac_base_20mm",self.FILTER,nil,false,self:UpdateTracers_Cannon(),50)
 			local effectdata = EffectData()
 			effectdata:SetOrigin(pos2)
 			effectdata:SetAngles(ang)
@@ -339,11 +343,8 @@ function ENT:FireCannons()
 			util.Effect("gred_particle_aircraft_muzzle",effectdata)
 		end
 	end
-end
-
-function ENT:TakeMGFFAmmo(amount)
-	amount = amount or 1
-	self:SetAmmoMGFF(math.max(self:GetAmmoMGFF() - amount,0))
+	self.NextCannon = ct + 0.08 
+	self:TakeCannonAmmo(#self.CannonPos)
 end
 
 function ENT:TakeCannonAmmo(amount)
@@ -361,7 +362,7 @@ function ENT:PrimaryAttack()
 		local pos2=self:LocalToWorld(v)
 		local num = 0.3
 		local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-		gred.CreateBullet(Driver,pos2,ang,"wac_base_12mm",{self},nil,false,Tracer_MG13,40)
+		gred.CreateBullet(Driver,pos2,ang,"wac_base_12mm",self.FILTER,nil,false,Tracer_MG13,40)
 		self:TakePrimaryAmmo()
 
 		local effectdata = EffectData()
@@ -416,6 +417,7 @@ function ENT:SecondaryAttack()
 			local mPos = Missile:GetPos()
 			local Ang = self:WorldToLocal( mPos ).y > 0 and -1 or 1
 			ent:SetPos( mPos )
+			ent.IsOnPlane = true
 			ent:SetAngles( self:LocalToWorldAngles( Angle(0,Ang,0) ) )
 			ent:Spawn()
 			ent:Activate()

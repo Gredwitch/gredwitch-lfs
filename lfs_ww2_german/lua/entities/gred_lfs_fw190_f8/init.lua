@@ -68,8 +68,7 @@ function ENT:OnTick() -- use this instead of "think"
 	local skin = self:GetSkin()
 	local ammo = self:GetAmmoSecondary()
 	if hp <= 400 then
-		if table.HasValue(self.DamageSkin,skin) then return end
-		if table.HasValue(self.CleanSkin,skin) then
+		if !table.HasValue(self.DamageSkin,skin) and table.HasValue(self.CleanSkin,skin) then
 			self:SetSkin(skin + 1)
 		end
 	else
@@ -85,7 +84,8 @@ function ENT:OnTick() -- use this instead of "think"
 		self.Bombs = nil
 	end
 	
-	self:SetBodygroup(1,1)
+	gred.HandleLandingGear(self,"gears")
+	gred.PartThink(self,skin)
 	if not self.Firing then
 		if loadout == 0 then -- Clean
 			if self.Bombs then
@@ -95,112 +95,103 @@ function ENT:OnTick() -- use this instead of "think"
 				self.Bombs = nil
 			end
 			self:SetAmmoSecondary(0)
-			self:SetBodygroup(4,0) -- Bomb pylon
-			self:SetBodygroup(3,0) -- Wing stuff
-		elseif loadout == 1 then -- 4xSC100
+			self:SetBodygroup(1,0) -- Bomb pylon
+		elseif loadout == 8 then -- 4xSC100 + 1xSC1000
 			if not (self.OldLoadout == loadout) then
-				self:AddBombs(1)
+				self:AddBombs(loadout)
 			else
 				if ammo != self.OldSecAmmo then
-					self:AddBombs(1,ammo)
+					self:AddBombs(loadout,ammo)
 				end
 			end
-			if ammo > 4 then
-				self:AddBombs(1,4)
+			if ammo > 5 then
+				self:AddBombs(loadout,8)
 			end
-			self:SetBodygroup(3,0) -- Wing stuff
-			self:SetBodygroup(4,2) -- Bomb pylon
-		elseif loadout == 2 then  -- 8xSC100
+			self:SetBodygroup(1,1) -- Bomb pylon
+		elseif loadout == 7 then  -- 1xSC1000
 			if not (self.OldLoadout == loadout) then
-				self:AddBombs(1,8)
+				self:AddBombs(loadout,1)
 			else
 				if ammo != self.OldSecAmmo then
-					self:AddBombs(1,ammo)
+					self:AddBombs(loadout,ammo)
+				end
+			end
+			if ammo > 1 then
+				self:AddBombs(loadout,1)
+			end
+			self:SetBodygroup(1,1) -- Bomb pylon
+		elseif loadout == 6 then -- 4xSC100
+			if not (self.OldLoadout == loadout) then
+				self:AddBombs(loadout)
+			else
+				if ammo != self.OldSecAmmo then
+					self:AddBombs(loadout,ammo)
+				end
+			end
+			if ammo > 5 then
+				self:AddBombs(loadout,5)
+			end
+			self:SetBodygroup(1,1) -- Bomb pylon
+		elseif loadout == 5 then  -- 8xSC100
+			if not (self.OldLoadout == loadout) then
+				self:AddBombs(loadout,1)
+			else
+				if ammo != self.OldSecAmmo then
+					self:AddBombs(loadout,ammo)
+				end
+			end
+			if ammo > 1 then
+				self:AddBombs(loadout,1)
+			end
+			self:SetBodygroup(1,1) -- Bomb pylon
+		elseif loadout == 4 then  -- 1xSC250
+			if not (self.OldLoadout == loadout) then
+				self:AddBombs(loadout,5)
+			else
+				if ammo != self.OldSecAmmo then
+					self:AddBombs(loadout,ammo)
+				end
+			end
+			self:SetBodygroup(1,1) -- Bomb pylon
+			if ammo > 5 then
+				self:AddBombs(loadout,5)
+			end
+		elseif loadout == 3 then  -- 1xSC250 + 4xSC100
+			if not (self.OldLoadout == loadout) then
+				self:AddBombs(loadout,1)
+			else
+				if ammo != self.OldSecAmmo then
+					self:AddBombs(loadout,ammo)
+				end
+			end
+			if ammo > 1 then
+				self:AddBombs(loadout,1)
+			end
+			self:SetBodygroup(1,1) -- Bomb pylon
+		elseif loadout == 2 then  -- 1xSC500
+			if not (self.OldLoadout == loadout) then
+				self:AddBombs(loadout,8)
+			else
+				if ammo != self.OldSecAmmo then
+					self:AddBombs(loadout,ammo)
 				end
 			end
 			if ammo > 8 then
-				self:AddBombs(1,8)
+				self:AddBombs(loadout,8)
 			end
-			self:SetBodygroup(3,4) -- Wing stuff
-			self:SetBodygroup(4,2) -- Bomb pylon
-		elseif loadout == 3 then  -- 1xSC250
+			self:SetBodygroup(1,2) -- Bomb pylon
+		elseif loadout == 1 then  -- 4xSC100
 			if not (self.OldLoadout == loadout) then
-				self:AddBombs(3)
+				self:AddBombs(loadout,4)
 			else
 				if ammo != self.OldSecAmmo then
-					self:AddBombs(3,ammo)
+					self:AddBombs(loadout,ammo)
 				end
 			end
-			if ammo > 1 then
-				self:AddBombs(3,1)
+			if ammo > 4 then
+				self:AddBombs(loadout,4)
 			end
-			self:SetBodygroup(3,0) -- Wing stuff
-			self:SetBodygroup(4,1) -- Bomb pylon
-		elseif loadout == 4 then  -- 1xSC250 + 4xSC100
-			if not (self.OldLoadout == loadout) then
-				self:AddBombs(4,5)
-			else
-				if ammo != self.OldSecAmmo then
-					self:AddBombs(4,ammo)
-				end
-			end
-			if ammo > 5 then
-				self:AddBombs(4,5)
-			end
-			self:SetBodygroup(3,4) -- Wing stuff
-			self:SetBodygroup(4,1) -- Bomb pylon
-		elseif loadout == 5 then  -- 1xSC500
-			if not (self.OldLoadout == loadout) then
-				self:AddBombs(5)
-			else
-				if ammo != self.OldSecAmmo then
-					self:AddBombs(5,ammo)
-				end
-			end
-			if ammo > 1 then
-				self:AddBombs(5,1)
-			end
-			self:SetBodygroup(3,0) -- Wing stuff
-			self:SetBodygroup(4,1) -- Bomb pylon
-		elseif loadout == 6 then  -- 1xSC500 + 4xSC100
-			if not (self.OldLoadout == loadout) then
-				self:AddBombs(6,5)
-			else
-				if ammo != self.OldSecAmmo then
-					self:AddBombs(6,ammo)
-				end
-			end
-			if ammo > 5 then
-				self:AddBombs(6,5)
-			end
-			self:SetBodygroup(3,4) -- Wing stuff
-			self:SetBodygroup(4,1) -- Bomb pylon
-		elseif loadout == 7 then  -- 1xSC1000
-			if not (self.OldLoadout == loadout) then
-				self:AddBombs(7)
-			else
-				if ammo != self.OldSecAmmo then
-					self:AddBombs(7,ammo)
-				end
-			end
-			if ammo > 1 then
-				self:AddBombs(7,1)
-			end
-			self:SetBodygroup(3,0) -- Wing stuff
-			self:SetBodygroup(4,1) -- Bomb pylon
-		elseif loadout == 8 then  -- 1xSC1000 + 4xSC100
-			if not (self.OldLoadout == loadout) then
-				self:AddBombs(8,5)
-			else
-				if ammo != self.OldSecAmmo then
-					self:AddBombs(8,ammo)
-				end
-			end
-			if ammo > 5 then
-				self:AddBombs(8,5)
-			end
-			self:SetBodygroup(3,4) -- Wing stuff
-			self:SetBodygroup(4,1) -- Bomb pylon
+			self:SetBodygroup(1,2) -- Bomb pylon
 		elseif loadout == 9 then  -- Mk 109
 			if self.Bombs then
 				for k,v in pairs(self.Bombs) do
@@ -211,16 +202,113 @@ function ENT:OnTick() -- use this instead of "think"
 			if not (self.OldLoadout == loadout) then
 				self:SetAmmoSecondary(70)
 			end
-			self:SetBodygroup(4,0) -- Bomb pylon
-			self:SetBodygroup(3,2) -- Wing stuff
+			self:SetBodygroup(1,0) -- Bomb pylon
+		elseif loadout == 10 then  -- 14x Pb2
+			if self.Bombs then
+				for k,v in pairs(self.Bombs) do
+					if IsValid(v) then v:Remove() end
+				end
+				self.Bombs = nil
+			end
+			if not (self.OldLoadout == loadout) then
+				self:SetAmmoSecondary(14)
+				ammo = 14
+			end
+			if ammo > 14 then
+				self:SetAmmoSecondary(14)
+				ammo = 14
+			end
+			self:SetBodygroup(1,0) -- Bomb pylon
 		end
 	end
 	self.OldLoadout = loadout
 	self.OldSecAmmo = ammo
+	gred.HandleLandingGear(self,"gears")
+	gred.PartThink(self,skin)
+	--[[
 	
-	self:SetBodygroup(2,1) -- MG FF
-	self:SetBodygroup(5,0) -- MG 17
-	self:SetBodygroup(6,0) -- MG 151 / MG 17
+		Bodygroup list
+		SELF :
+			1 : Undercarriage bomb pylons
+				0 : blank
+				1 : 1xbomb
+				2 : 4xbombs
+			2 : Nose guns
+				0 : MG 17s
+				1 : Nothing
+				2 : Mk 108
+				
+		WINGS :
+			1 : MG FF
+				0 : MG FF
+				1 : No MG FF
+			2 : Under wings stuff
+				0 : blank
+				1 : 210mm rockets
+				2 : 15mm MGs
+				3 : 30mm cannons
+				4 : R4M rockets
+				5 : bomb pylons
+	--]]
+	self:SetBodygroup(2,2)
+	local priAmmo = self:GetAmmoPrimary()
+	local val
+	if loadout == 2 or loadout == 4 or loadout == 6 or loadout == 8 then
+		val = 5
+	elseif loadout == 9 then
+		val = 3
+	elseif loadout == 10 then
+		val = 4
+	else
+		val = 0
+	end
+	if self.Parts.wing_l then
+		self.Parts.wing_l:SetBodygroup(1,1)
+		self.Parts.wing_l:SetBodygroup(2,val)
+	else
+		if !self.WING_L_UPDATED then
+			self.WING_L_UPDATED = true
+			self.BulletPos[3] = nil
+			self.Mk103[2] = nil
+			self.MaxPrimaryAmmo = self.MaxPrimaryAmmo - 250
+			self.MaxSecondaryAmmo = self.WING_R_UPDATED and 0 or self.MaxSecondaryAmmo / 2
+			priAmmo = priAmmo - 250
+			self:SetAmmoPrimary(priAmmo)
+			self.BOMBS[6] = nil
+			self.Rockets[2] = nil
+			self.BOMBS[7] = nil
+		end
+	end
+	if self.Parts.wing_r then
+		self.Parts.wing_r:SetBodygroup(1,1)
+		self.Parts.wing_r:SetBodygroup(2,val)
+	else
+		if !self.WING_R_UPDATED then
+			self.WING_R_UPDATED = true
+			self.Mk103[1] = nil
+			self.BulletPos[2] = nil
+			self.MaxPrimaryAmmo = self.MaxPrimaryAmmo - 250
+			priAmmo = priAmmo - 250
+			self.MaxSecondaryAmmo = self.WING_L_UPDATED and 0 or self.MaxSecondaryAmmo / 2
+			self:SetAmmoPrimary(priAmmo)
+			self.BOMBS[8] = nil
+			self.Rockets[1] = nil
+			self.BOMBS[9] = nil
+		end
+	end
+	if priAmmo > self.MaxPrimaryAmmo then self:SetAmmoPrimary(self.MaxPrimaryAmmo) end
+	local maxmissiles = self.WING_L_UPDATED and self.WING_R_UPDATED and 0 or (((self.WING_L_UPDATED and !self.WING_R_UPDATED) or (!self.WING_L_UPDATED and self.WING_R_UPDATED)) and 7 or 14)
+	
+	if (loadout == 9 and ammo > self.MaxSecondaryAmmo) or (loadout == 10 and ammo > maxmissiles) then 
+		ammo = loadout == 10 and 7 or self.MaxSecondaryAmmo
+		self:SetAmmoSecondary(ammo) 
+	end
+	self.OldLoadout = loadout
+	self.OldSecAmmo = ammo
+end
+
+function ENT:CalcFlightOverride( Pitch, Yaw, Roll, Stability )
+	return gred.PartCalcFlight(self,Pitch,Yaw,Roll,Stability,1,0.2)
 end
 
 function ENT:RunOnSpawn()
@@ -248,6 +336,7 @@ function ENT:RunOnSpawn()
 	elseif loadout == 4 then
 		self:AddBombs(3)
 	end
+	gred.InitAircraftParts(self,600)	
 end
 
 function ENT:AddBombs(n,b)
@@ -263,7 +352,7 @@ function ENT:AddBombs(n,b)
 	if istable(self.BOMBS) then
 		self.Bombs = {}
 		local s = 0
-		if n == 1 then
+		if n == 1 or n == 2 then
 			for k,v in pairs( self.BOMBS ) do
 				if k != 1 then
 					if b != nil then
@@ -393,7 +482,7 @@ function ENT:AddBombs(n,b)
 		elseif n == 6 then
 			for k,v in pairs( self.BOMBS ) do
 				if b != nil then -- if there is no B
-					if s <= b then -- k should never be > b
+					if s < b then -- k should never be > b
 						if k != 1 then -- if its not the 250Kg bomb
 							if k > 5 then
 								local bomb = ents.Create("gb_bomb_sc100")
@@ -701,7 +790,7 @@ function ENT:FireCannons()
 		for k,v in pairs (self.CannonPos) do
 			local pos2 = self:LocalToWorld(v)
 			local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-			gred.CreateBullet(Driver,pos2,ang,"wac_base_20mm",{self},nil,false,Tracer_cannon)
+			gred.CreateBullet(Driver,pos2,ang,"wac_base_20mm",self.FILTER,nil,false,Tracer_cannon)
 			if (k == 2) then self.NextCannon = ct + 0.08 self:TakeCannonAmmo(2) end
 
 			local effectdata = EffectData()
@@ -723,7 +812,7 @@ function ENT:PrimaryAttack()
 		local pos2=self:LocalToWorld(v)
 		local num = 0.3
 		local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-		gred.CreateBullet(Driver,pos2,ang,"wac_base_12mm",{self},nil,false,Tracer_MG13,40)
+		gred.CreateBullet(Driver,pos2,ang,"wac_base_12mm",self.FILTER,nil,false,Tracer_MG13,40)
 		self:TakePrimaryAmmo()
 
 		local effectdata = EffectData()
@@ -748,7 +837,7 @@ function ENT:SecondaryAttack()
 			local locaang = Angle(-0.5,(v.y > 0 and -1 or 1),0)
 			local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num))) + 
 			locaang
-			gred.CreateBullet(Driver,pos2,ang,"wac_base_30mm",{self},nil,false,Tracer_Mk103,200)
+			gred.CreateBullet(Driver,pos2,ang,"wac_base_30mm",self.FILTER,nil,false,Tracer_Mk103,200)
 			self:TakeSecondaryAmmo()
 
 			local effectdata = EffectData()
@@ -757,6 +846,26 @@ function ENT:SecondaryAttack()
 			effectdata:SetEntity(self)
 			util.Effect("gred_particle_aircraft_muzzle",effectdata)
 		end
+	elseif loadout == 10 then
+		if #self.Rockets == 0 then return end
+		self:SetNextSecondary( 0.2 )
+		self:TakeSecondaryAmmo()
+		self.CurMissile = self.CurMissile and self.CurMissile == 1 and 2 or 1 or 1
+		local ent = ents.Create( "gb_rocket_rp3" )
+		local mPos = self:LocalToWorld(self.Rockets[self.CurMissile] and self.Rockets[self.CurMissile] or self.Rockets[self.CurMissile == 1 and 2 or 1])
+		local Ang = self:WorldToLocal( mPos ).y > 0 and -1 or 1
+		ent:SetPos( mPos )
+		ent.IsOnPlane = true
+		ent:SetAngles( self:LocalToWorldAngles( Angle(-5,Ang,0) ) )
+		ent:Spawn()
+		ent:Activate()
+		ent:SetOwner(self:GetDriver())
+		ent.phys = ent:GetPhysicsObject()
+		local p = self:GetPhysicsObject() 
+		if IsValid(p) and IsValid(ent.phys) then ent.phys:AddVelocity(p:GetVelocity()) end
+		ent:Launch()
+		
+		for k,v in pairs(self.FILTER) do constraint.NoCollide( ent, v, 0, 0 ) end
 	else
 		if self:GetAI() then return end
 		self:SetNextSecondary( 0.4 )

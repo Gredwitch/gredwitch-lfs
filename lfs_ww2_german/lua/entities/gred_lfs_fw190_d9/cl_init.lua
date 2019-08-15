@@ -1,30 +1,30 @@
 
 include("shared.lua")
+ENT.EmitNow		= {}
+ENT.SoundQueue	= {}
+ENT.BumpSound	= nil
 
-function ENT:LFSCalcViewFirstPerson( view ) -- modify first person camera view here
-	--[[
-	local ply = LocalPlayer()
-	if ply == self:GetDriver() then
-		-- driver view
-	elseif ply == self:GetGunner() then
-		-- gunner view
-	else
-		-- everyone elses view
-	end
-	]]--
-	
-	return view
+function ENT:LFSHUDPaintFilter()
+	return gred.LFSHUDPaintFilterParts(self)
 end
 
-function ENT:LFSCalcViewThirdPerson( view ) -- modify third person camera view here
-	return view
-end
 function ENT:LFSHudPaint( X, Y, data ) -- driver only
-	draw.SimpleText( "MG151/20", "LFS_FONT", 10, 135, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-	draw.SimpleText( self:GetAmmoCannon(), "LFS_FONT", 120, 135, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-	-- draw.SimpleText( "MG151/20", "LFS_FONT", 10, 160, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-	-- draw.SimpleText( self:GetAmmoCannon(), "LFS_FONT", 120, 160, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	local y = 135
+	if self.GetAmmoMGFF then
+		draw.SimpleText( "MGFF", "LFS_FONT", 10, y, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+		draw.SimpleText( self:GetAmmoMGFF(), "LFS_FONT", 120, y, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+		y = y + 25
+	end
+	if self.GetAmmoCannon then
+		draw.SimpleText( "MG151/20", "LFS_FONT", 10, y, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+		draw.SimpleText( self:GetAmmoCannon(), "LFS_FONT", 120, y, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	end
 end
+
+function ENT:LFSCalcViewThirdPerson(view,ply)
+	return gred.CalcViewThirdPersonLFSParts(self,view,ply)
+end
+
 function ENT:CalcEngineSound( RPM, Pitch, Doppler )
 	local Low = 500
 	local Mid = 1000
@@ -72,23 +72,6 @@ function ENT:Initialize()
 	gred.UpdateBoneTable(self)
 end
 
-function ENT:CreateBones()
-	self.Bones = nil
-	timer.Simple(0,function()
-		if not self && IsValid(self) then return end
-		self.Bones = {}
-		local name
-		for i=0, self:GetBoneCount()-1 do
-			name = self:GetBoneName(i)
-			if name == "__INVALIDBONE__" then
-				self.Bones = nil
-				break
-			end
-			self.Bones[name] = i
-		end
-	end)
-end
-
 function ENT:OnRemove()
 	self:SoundStop()
 	
@@ -107,7 +90,15 @@ function ENT:SoundStop()
 	end
 end
 
+
 function ENT:AnimFins()
+	local Ply = LocalPlayer()
+	local ply = Ply:GetViewEntity()
+	local hp = self:GetHP()
+	local ct = CurTime()
+	
+	-- gred.HandleFlyBySound(self,ply,ct,2600,12000,6,"LFS_JET_PASSBY_CLOSE_0"..math.random(1,3))
+	gred.HandleVoiceLines(self,ply,ct,hp)
 	if not self.Bones then gred.UpdateBoneTable(self) return end
 	local FT = FrameTime() * 10
 	local Pitch = self:GetRotPitch()
@@ -157,7 +148,7 @@ function ENT:AnimFins()
 	gred.ManipulateBoneAngles(self,"speed",Angle(0,speed_meters))
 	
 	---------------------------
-	gred.ManipulateBoneAngles(self,"aviahorizon_pitch",Angle(0,ang.r,ang.p))
+	gred.ManipulateBoneAngles(self,"aviahorizon_pitch",Angle(0,ang.r,-ang.p))
 	local r = ang.r
 	if r > 15 then r = 15 elseif r < -15 then r = -15 end
 	gred.ManipulateBoneAngles(self,"bank",Angle(0,r))
@@ -206,39 +197,35 @@ function ENT:AnimCabin()
 	local TVal = bOn and 0 or 1
 	local Speed = FrameTime() * 4
 	self.SMcOpen = self.SMcOpen and self.SMcOpen + math.Clamp(TVal - self.SMcOpen,-Speed,Speed) or 0
-	self:ManipulateBonePosition(10,Vector(0,0,-self.SMcOpen * 28))
-	if self.SMcOpen == 0 then
-		self:ManipulateBoneScale(7,Vector(1,self.SMcOpen/1.25,1))
-	else
-		self:ManipulateBoneScale(7,Vector(1,self.SMcOpen,1))
-	end
-	self:ManipulateBoneAngles(7,Angle(0,0,self.SMcOpen*1.5))
+	gred.ManipulateBonePosition(self,"blister",Vector(0,0,-self.SMcOpen * 28))
+	gred.ManipulateBoneScale(self,"rope",Vector(1,self.SMcOpen*(self.SMcOpen == 0 and 0.75 or 1),1))
+	gred.ManipulateBoneAngles(self,"rope",Angle(0,0,self.SMcOpen*1.5))
 	
 end
 
 function ENT:AnimLandingGear()
-	if not self.Bones then gred.UpdateBoneTable(self) return end
-	self.SMLG = self.SMLG and self.SMLG + ((1 - self:GetLGear()) - self.SMLG) * FrameTime() * 8 or 0
-	self.SMRG = self.SMRG and self.SMRG + ((1 - self:GetRGear()) - self.SMRG) * FrameTime() * 8 or 0
+	-- if not self.Bones then gred.UpdateBoneTable(self) return end
+	-- self.SMLG = self.SMLG and self.SMLG + ((1 - self:GetLGear()) - self.SMLG) * FrameTime() * 8 or 0
+	-- self.SMRG = self.SMRG and self.SMRG + ((1 - self:GetRGear()) - self.SMRG) * FrameTime() * 8 or 0
 	
-	local gExp = self.SMRG ^ 40
-	gred.ManipulateBoneAngles(self,"gear_r_1",Angle(0,0,-90 + 90 * self.SMRG) )
-	gred.ManipulateBoneAngles(self,"gear_l_1",Angle(0,0,-90 + 90 * self.SMLG) )
+	-- local gExp = self.SMRG ^ 40
+	-- gred.ManipulateBoneAngles(self,"gear_r_1",Angle(0,0,-90 + 90 * self.SMRG) )
+	-- gred.ManipulateBoneAngles(self,"gear_l_1",Angle(0,0,-90 + 90 * self.SMLG) )
 	
-	gred.ManipulateBoneAngles(self,"flap_l",Angle(30 + -30 * self.SMLG) )
-	gred.ManipulateBoneAngles(self,"flap_r",Angle(-30 + 30 * self.SMLG) )
+	-- gred.ManipulateBoneAngles(self,"flap_l",Angle(30 + -30 * self.SMLG) )
+	-- gred.ManipulateBoneAngles(self,"flap_r",Angle(-30 + 30 * self.SMLG) )
 	
-	gred.ManipulateBoneAngles(self,"gear_r_2",Angle(0,0,-90 + 90 * self.SMRG) )
-	gred.ManipulateBoneAngles(self,"gear_l_2",Angle(0,0,-98 + 98 * self.SMLG) )
+	-- gred.ManipulateBoneAngles(self,"gear_r_2",Angle(0,0,-90 + 90 * self.SMRG) )
+	-- gred.ManipulateBoneAngles(self,"gear_l_2",Angle(0,0,-98 + 98 * self.SMLG) )
 	
-	gred.ManipulateBoneAngles(self,"gear_r_3",Angle(0,0,-110 + 110 * self.SMRG) )
-	gred.ManipulateBoneAngles(self,"gear_l_3",Angle(0,0,-110 + 110 * self.SMLG) )
+	-- gred.ManipulateBoneAngles(self,"gear_r_3",Angle(0,0,-110 + 110 * self.SMRG) )
+	-- gred.ManipulateBoneAngles(self,"gear_l_3",Angle(0,0,-110 + 110 * self.SMLG) )
 	
 	
-	gred.ManipulateBonePosition(self,"gear_b_1",Vector(0,-20 + 20 * self.SMLG) )
+	-- gred.ManipulateBonePosition(self,"gear_b_1",Vector(0,-20 + 20 * self.SMLG) )
 	
-	gred.ManipulateBoneAngles(self,"gear_l_4",Angle(55 + -55 * gExp) )
-	gred.ManipulateBoneAngles(self,"gear_r_4",Angle(-55 + 55 * gExp) )
+	-- gred.ManipulateBoneAngles(self,"gear_l_4",Angle(55 + -55 * gExp) )
+	-- gred.ManipulateBoneAngles(self,"gear_r_4",Angle(-55 + 55 * gExp) )
 end
 
 function ENT:ExhaustFX()

@@ -111,3 +111,38 @@ end
 function ENT:GetCalcViewFilter(ent)
 	return not ent.ClassName == "gred_prop_part"
 end
+
+function ENT:GetPartModelPath(k)
+	return "models/gredwitch/f86_lfs/f86_"..k..".mdl"
+end
+
+ENT.PartParents = {
+	gear_c1 	= false,
+	gear_c3 	= false,
+	gear_c2 	= "gear_c3",
+	wheel_c 	= "gear_c3",
+	
+	tail 		= false,
+	rudder 		= "tail",
+	elevator 	= "tail",
+	airbrake_l1 = "tail",
+	airbrake_l2 = "tail",
+	airbrake_l3 = "tail",
+	airbrake_r1 = "tail",
+	airbrake_r2 = "tail",
+	airbrake_r3 = "tail",
+	
+	wing_l 		= "wing_l",
+	aileron_l 	= "wing_l",
+	flap_l 		= "wing_l",
+	gear_l2 	= "wing_l",
+	wheel_l 	= "gear_l1",
+	gear_l1 	= "wing_l",
+	gear_r1 	= "wing_r",
+	
+	wing_r 		= "wing_r",
+	aileron_r 	= "wing_r",
+	flap_r 		= "wing_r",
+	gear_r2 	= "wing_r",
+	wheel_r 	= "gear_r1",
+}

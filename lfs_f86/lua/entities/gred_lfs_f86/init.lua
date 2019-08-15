@@ -14,11 +14,6 @@ function ENT:SpawnFunction( ply, tr, ClassName ) -- called by garry
 	return ent
 end
 
-function ENT:IsSmall(k)
-	local startsWith = string.StartWith
-	return startsWith(k,"gear") or startsWith(k,"wheel") or startsWith(k,"airbrake")
-end
-
 function ENT:RunOnSpawn() -- called when the vehicle is spawned
 	Hidden = Color(255,255,255,0)
 	Shown = Color(255,255,255,255)
@@ -33,76 +28,11 @@ function ENT:RunOnSpawn() -- called when the vehicle is spawned
 			table.insert(self.DamageSkin,i)
 		end
 	end
-	self.Attachements = {}
-	self.Parts = {}
-	local tostring = tostring
-	local pairs = pairs
-	local GetModel = GetModel
 	
-	for k,v in pairs (self:GetAttachments()) do
-		self.Attachements[v.name] = self:LookupAttachment(tostring(v.name))
-	end
-	for k,v in pairs(self.Attachements) do
-		if k != "blister" then
-			local ent = ents.Create("gred_prop_part")
-			ent:SetModel("models/gredwitch/f86_lfs/f86_"..k..".mdl")
-			ent:SetPos(self:GetAttachment(self.Attachements[k]).Pos)
-			ent:SetAngles(self:GetAngles())
-			ent:SetParent(self,self.Attachements[k])
-			if k == "tail" then
-				ent.MaxHealth = 1100
-			elseif k == "wing_r" or k == "wing_l" then
-				ent.MaxHealth = 600
-				ent.Mass = 500
-			elseif self:IsSmall(k) then
-				ent.MaxHealth = 100
-			else
-				ent.MaxHealth = 350
-			end
-			ent.CurHealth = ent.MaxHealth
-			ent:Spawn()
-			ent:Activate()
-			self.Parts[k] = ent
-		end
-	end
-	for k,v in pairs(self.Parts) do
-		v.Parts = self.Parts
-		v.Plane = self
-		self.GibModels[k] = v:GetModel()
-	end
-	self.Parts.gear_c1.PartParent = self
-	self.Parts.gear_c2.PartParent = self
-	self.Parts.gear_c3.PartParent = self.Parts.gear_c2
-	self.Parts.wheel_c.PartParent = self.Parts.gear_c3
-	
-	self.Parts.tail.PartParent = self.Parts.tail
-	self.Parts.rudder.PartParent = self.Parts.tail
-	self.Parts.elevator.PartParent = self.Parts.tail
-	self.Parts.airbrake_l1.PartParent = self.Parts.tail
-	self.Parts.airbrake_l2.PartParent = self.Parts.tail
-	self.Parts.airbrake_l3.PartParent = self.Parts.tail
-	self.Parts.airbrake_r1.PartParent = self.Parts.tail
-	self.Parts.airbrake_r2.PartParent = self.Parts.tail
-	self.Parts.airbrake_r3.PartParent = self.Parts.tail
-	
-	self.Parts.wing_l.PartParent = self.Parts.wing_l
-	self.Parts.aileron_l.PartParent = self.Parts.wing_l
-	self.Parts.flap_l.PartParent = self.Parts.wing_l
-	self.Parts.gear_l2.PartParent = self.Parts.wing_l
-	self.Parts.wheel_l.PartParent = self.Parts.gear_l2
-	self.Parts.gear_l1.PartParent = self.Parts.wing_l
-	self.Parts.gear_r1.PartParent = self.Parts.wing_r
-	
-	self.Parts.wing_r.PartParent = self.Parts.wing_r
-	self.Parts.aileron_r.PartParent = self.Parts.wing_r
-	self.Parts.flap_r.PartParent = self.Parts.wing_r
-	self.Parts.gear_r2.PartParent = self.Parts.wing_r
-	self.Parts.wheel_r.PartParent = self.Parts.gear_r2
+	gred.InitAircraftParts(self)
 	
 	self.TracerConvar = GetConVar("gred_sv_tracers")
 	self:CreateHVARs()
-	
-	self.LOADED = 1
 end
 
 function ENT:CreateHVARs()
@@ -178,39 +108,10 @@ function ENT:HandleWeapons(Fire1, Fire2)
 end
 
 function ENT:OnTick()
-	if not self.LOADED then return end
-	if self.LOADED == 1 then
-		local NoCollide = constraint.NoCollide
-		for k,v in pairs(self.Parts) do
-			self:DeleteOnRemove(v)
-			NoCollide(v,self,0,0)
-			NoCollide(v,self.wheel_R,0,0)
-			NoCollide(v,self.wheel_L,0,0)
-			NoCollide(v,self.wheel_C,0,0)
-			NoCollide(v,self.wheel_C_master,0,0)
-			if k == "tail" or k == "wing_l" or k == "wing_r" then
-				v:SetParent(nil)
-				v:SetPos(self:GetAttachment(self.Attachements[k]).Pos)
-				v.Weld = constraint.Weld(v,self,0,0,0,true,false)
-			end
-			for a,p in pairs(self.Parts) do
-				NoCollide(v,p,0,0)
-			end
-			v.LOADED = true
-			v.PartName = k
-		end
-		net.Start("gred_lfs_setparts")
-			net.WriteEntity(self)
-			net.WriteTable(self.Parts)
-		net.Broadcast()
-		self.LOADED = true
-	end
-	
 	local hp = self:GetHP()
 	local skin = self:GetSkin()
 	if hp <= 250 then
-		if table.HasValue(self.DamageSkin,skin) then return end
-		if table.HasValue(self.CleanSkin,skin) then
+		if !table.HasValue(self.DamageSkin,skin) and table.HasValue(self.CleanSkin,skin) then
 			self:SetSkin(skin + 1)
 		end
 	else
@@ -218,80 +119,16 @@ function ENT:OnTick()
 			self:SetSkin(skin-1)
 		end
 	end
-	for k,v in pairs(self.Parts) do
-		if not IsValid(v) then
-			if k == "wheel_c" then
-				self.wheel_C:Remove()
-				self.wheel_C_master:Remove()
-			end
-			if k == "wheel_r" then
-				self.wheel_R:Remove()
-			end
-			if k == "wheel_l" then
-				self.wheel_L:Remove()
-			end
-			net.Start("gred_lfs_remparts")
-				net.WriteEntity(self)
-				net.WriteString(k)
-			net.Broadcast()
-			self.Parts[k] = nil
-			self.GibModels[k] = nil
-			k = nil
-		return end
-		local skin = self:GetSkin()
-		if v.PartParent.Destroyed or !IsValid(v.PartParent) then
-			v.CurHealth = 0
-			v.DONOTEMIT = true
-		end
-		if v.CurHealth <= v.MaxHealth/2 then
-			if not table.HasValue(self.DamageSkin,skin) then
-				v:SetSkin(skin+1)
-			end
-			if v.CurHealth <=0 then
-				if k == "wheel_c" then
-					self.wheel_C:Remove()
-					self.wheel_C_master:Remove()
-				end
-				if k == "wheel_r" then
-					self.wheel_R:Remove()
-				end
-				if k == "wheel_l" then
-					self.wheel_L:Remove()
-				end
-				constraint.RemoveAll(v)
-				if not v.DONOTEMIT then
-					v:EmitSound("LFS_PART_DESTROYED_0"..math.random(1,3))
-				end
-				v:SetParent(nil)
-				v:SetVelocity(self:GetVelocity())
-				v.Destroyed = true
-				self.Parts[k] = nil
-				self.GibModels[k] = nil
-			end
-			net.Start("gred_lfs_remparts")
-				net.WriteEntity(self)
-				net.WriteString(k)
-			net.Broadcast()
-		else
-			if table.HasValue(self.DamageSkin,skin) then
-				v:SetSkin(skin-1)
-			else
-				v:SetSkin(skin)
-			end
-		end
-	end
+	if not self.LOADED then return end
+	
+	gred.HandleLandingGear(self,"gears")
+	gred.PartThink(self,skin)
+	
 	if not self.Parts.tail and not self.oof then
 		self:TakeDamage(self.MaxHealth,self,self)
+		self.oof = true
 	end
-	if not self.CurSeq then
-	self.CurSeq = self:GetSequenceName(self:GetSequence())
-	end
-	if self.CurSeq != "gears" then
-		self:ResetSequence("gears")
-		self.CurSeq = self:GetSequenceName(self:GetSequence())
-	end
-	self.SMLG = self.SMLG and self.SMLG + ((0 + self:GetLGear()) - self.SMLG) * FrameTime() * 2 or 0
-	self:SetCycle(self.SMLG)
+	
 	
 	-------------------------------
 	
@@ -435,35 +272,8 @@ function ENT:OnTick()
 end
 
 function ENT:CalcFlightOverride( Pitch, Yaw, Roll, Stability )
-
-	local addRoll = 0
-	local addYaw = 0
-	local vel = self:GetVelocity():Length()
-	if not self.Parts.wing_l then
-		addRoll = 0.3*vel
-		addYaw = vel*0.02
-	end
-	if not self.Parts.wing_r then
-		addRoll = !self.Parts.wing_l and addRoll or -0.3*vel
-		addYaw = !self.Parts.wing_l and addYaw - vel*0.09 or addYaw - vel*0.02
-	end
-	if not self.Parts.aileron_l then
-		if Roll < 0 then Roll = Roll/2 end
-	end
-	if not self.Parts.aileron_r then
-		if Roll > 0 then Roll = Roll/2 end
-	end
-	if not self.Parts.elevator then
-		Pitch = 0
-	end
-	if not self.Parts.rudder then
-		Yaw = 0
-	end
-	Roll = Roll + addRoll
-	Yaw = Yaw + addYaw
-	return Pitch,Yaw,Roll,Stability,Stability,Stability
+	return gred.PartCalcFlight(self,Pitch,Yaw,Roll,Stability)
 end
-
 
 function ENT:RemoveBombs()
 	if self.Bombs then
@@ -594,6 +404,7 @@ function ENT:AddBombs(n,b)
 		if not isnumber(b) then self:SetAmmoSecondary(s) end
 	end
 end
+
 local tracer = 0
 function ENT:PrimaryAttack()
 	if not self:CanPrimaryAttack() then return end

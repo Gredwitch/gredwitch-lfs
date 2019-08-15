@@ -130,29 +130,6 @@ sound.Add( 	{
 } )
 
 ---------------------------------------------------------------
-for i = 1,3 do
-sound.Add( 	{
-	name = "GRED_VO_HOLE_LEFT_WING_0"..i,
-	channel = CHAN_STATIC,
-	volume = 1.0,
-	level = 125,
-	sound = "gredwitch/voice/eng_left_wing_v1_r"..i.."_t1_mood_high.wav"
-} )
-sound.Add( 	{
-	name = "GRED_VO_HOLE_RIGHT_WING_0"..i,
-	channel = CHAN_STATIC,
-	volume = 1.0,
-	level = 125,
-	sound = "gredwitch/voice/eng_right_wing_v1_r"..i.."_t1_mood_high.wav"
-} )
-sound.Add( 	{
-	name = "GRED_VO_BAILOUT_0"..i,
-	channel = CHAN_STATIC,
-	volume = 1.0,
-	level = 90,
-	sound = "gredwitch/voice/eng_bailout_v1_r"..i.."_t1_mood_high.wav"
-} )
-end
 
 gred = gred or {}
 local tableinsert = table.insert
@@ -160,30 +137,3 @@ gred.AddonList = gred.AddonList or {}
 tableinsert(gred.AddonList,1131455085) -- Base
 tableinsert(gred.AddonList,1571918906) -- LFS Base
 tableinsert(gred.AddonList,971538203) -- Content
-
-if SERVER then
-	util.AddNetworkString("gred_lfs_setparts")
-	util.AddNetworkString("gred_lfs_remparts")
-end
-if CLIENT then
-	net.Receive("gred_lfs_setparts",function()
-		local self = net.ReadEntity()
-		if not self then print("[F-86] ERROR! ENTITY NOT INITALIZED CLIENT SIDE! PLEASE, RE-SPAWN!") return end
-		self.Parts = {}
-		for k,v in pairs(net.ReadTable()) do
-			self.Parts[k] = v
-		end
-	end)
-	net.Receive("gred_lfs_remparts",function()
-		local self = net.ReadEntity()
-		local k = net.ReadString()
-		
-		self.EmitNow = self.EmitNow or {}
-		if (k == "wing_l" or k == "wing_r") and self.EmitNow[k] != "CEASE" then
-			self.EmitNow[k] = true
-		end
-		if self.Parts then
-			self.Parts[k] = nil
-		end
-	end)
-end

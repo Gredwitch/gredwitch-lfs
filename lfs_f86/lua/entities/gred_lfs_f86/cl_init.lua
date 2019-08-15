@@ -7,16 +7,11 @@ ENT.SoundQueue	= {}
 ENT.BumpSound	= nil
 
 function ENT:LFSHUDPaintFilter()
-	local partnum = {}
-	local a = 1
-	if self.Parts then
-		for k,v in pairs(self.Parts) do
-			partnum[a] = v
-			a = a + 1
-		end
-	end
-	partnum[a] = self
-	return partnum
+	return gred.LFSHUDPaintFilterParts(self)
+end
+
+function ENT:LFSCalcViewThirdPerson(view,ply)
+	return gred.CalcViewThirdPersonLFSParts(self,view,ply)
 end
 
 function ENT:CalcEngineSound( RPM, Pitch, Doppler )
@@ -48,35 +43,6 @@ function ENT:CalcEngineSound( RPM, Pitch, Doppler )
 		self.snd.DIST:ChangePitch(  math.Clamp(math.Clamp( 50 + Pitch * 60, 50,255) + Doppler,0,255) )
 		self.snd.DIST:ChangeVolume( math.Clamp( -1 + Pitch * 6, 0,1) )
 	end
-end
-
-function ENT:LFSCalcViewThirdPerson(view, ply)
-	view.origin = ply:EyePos()
-	local Parent = ply:lfsGetPlane()
-	local Pod = ply:GetVehicle()
-	local radius = 550
-	radius = radius + radius * Pod:GetCameraDistance()
-	local TargetOrigin = view.origin - view.angles:Forward() * radius  + view.angles:Up() * radius * 0.2
-	local WallOffset = 4
-	local tr = util.TraceHull( {
-		start = view.origin,
-		endpos = TargetOrigin,
-		filter = function( e )
-			local c = e:GetClass()
-			local collide = not c:StartWith( "prop_physics" ) and not c:StartWith( "prop_dynamic" ) and not c:StartWith( "prop_ragdoll" ) and not e:IsVehicle() and not c:StartWith( "gmod_" ) and not c:StartWith( "player" ) and not e.LFS and Parent:GetCalcViewFilter(e)
-			
-			return collide
-		end,
-		mins = Vector( -WallOffset, -WallOffset, -WallOffset ),
-		maxs = Vector( WallOffset, WallOffset, WallOffset ),
-	} )
-	view.origin = tr.HitPos
-	
-	if tr.Hit and not tr.StartSolid then
-		view.origin = view.origin + tr.HitNormal * WallOffset
-	end
-	
-	return view
 end
 
 function ENT:LFSCalcViewFirstPerson( view, ply )
@@ -122,70 +88,16 @@ function ENT:SoundStop()
 		v:Stop()
 	end
 end
-local BaseClass = baseclass.Get("lunasflightschool_basescript")
 
-function ENT:Think()
+function ENT:AnimFins()
 	local Ply = LocalPlayer()
 	local ply = Ply:GetViewEntity()
 	local hp = self:GetHP()
 	local ct = CurTime()
-	self.BumpSound = self.BumpSound or ct
-	ply.NGPLAY = ply.NGPLAY or 0
 	
-	ply.lfsGetPlane = ply.lfsGetPlane or function() return nil end
-	if ply:lfsGetPlane() != self and (ply.NGPLAY < ct) and self:GetEngineActive() then
-		local vel = self:GetVelocity():Length()
-		if vel >= 2600 then
-			local plypos = ply:GetPos()
-			local pos = self:GetPos()
-			local dist = pos:Distance(plypos)
-			if dist < 12000 then
-				ply.NGPLAY = ct + 6
-				ply:EmitSound("LFS_JET_PASSBY_CLOSE_0"..math.random(1,3))
-			end
-		end
-	end
+	gred.HandleFlyBySound(self,ply,ct,2600,12000,6,"LFS_JET_PASSBY_CLOSE_0"..math.random(1,3))
+	gred.HandleVoiceLines(self,ply,ct,hp)
 	
-	if self.BumpSound < ct then
-		for k,v in pairs(self.SoundQueue) do
-			ply:EmitSound(v)
-			
-			table.RemoveByValue(self.SoundQueue,v)
-			self.BumpSound = ct + 4
-			break
-		end
-	end
-	
-	if self.IsDead then
-		local Driver = self:GetDriver()
-		if self.CheckDriver and Driver != self.OldDriver and !IsValid(Driver) then
-			for k,v in pairs(player.GetAll()) do
-				if v:lfsGetAITeam() == self.OldDriver:lfsGetAITeam() and (IsValid(v:lfsGetPlane()) or v == self.OldDriver) then
-					v:EmitSound("GRED_VO_BAILOUT_0"..math.random(1,3))
-				end
-			end
-		end
-		self.CheckDriver = true
-		self.OldDriver = Driver
-	end
-	if ply:lfsGetPlane() == self then
-		if self.EmitNow.wing_r and self.EmitNow.wing_r != "CEASE" then
-			self.EmitNow.wing_r = "CEASE"
-			table.insert(self.SoundQueue,"GRED_VO_HOLE_RIGHT_WING_0"..math.random(1,3))
-		end
-		if self.EmitNow.wing_l and self.EmitNow.wing_l != "CEASE" then
-			self.EmitNow.wing_l = "CEASE"
-			table.insert(self.SoundQueue,"GRED_VO_HOLE_LEFT_WING_0"..math.random(1,3))
-		end
-		if hp == 0 then
-			self.IsDead = true
-		end
-	end
-	-- self.OldHP = hp
-	BaseClass.Think(self)
-end
-
-function ENT:AnimFins()
 	if not self.Bones then gred.UpdateBoneTable(self) return end
 	local FT = FrameTime() * 10
 	local Pitch = self:GetRotPitch()

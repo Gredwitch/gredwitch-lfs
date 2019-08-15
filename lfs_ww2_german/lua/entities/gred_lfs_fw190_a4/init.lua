@@ -18,8 +18,7 @@ function ENT:OnTick() -- use this instead of "think"
 	local hp = self:GetHP()
 	local skin = self:GetSkin()
 	if hp <= 350 then
-		if table.HasValue(self.DamageSkin,skin) then return end
-		if table.HasValue(self.CleanSkin,skin) then
+		if !table.HasValue(self.DamageSkin,skin) and table.HasValue(self.CleanSkin,skin) then
 			self:SetSkin(skin + 1)
 		end
 	else
@@ -28,12 +27,76 @@ function ENT:OnTick() -- use this instead of "think"
 		end
 	end
 	self.OldLoadout = loadout
-	self:SetBodygroup(1,1) -- Rocket tube
-	self:SetBodygroup(2,0) -- MG FF
-	self:SetBodygroup(3,0) -- 15mm R1
-	self:SetBodygroup(4,0) -- Bomb pylon
-	self:SetBodygroup(6,0) -- MG 17
-	-- self:SetBodygroup(7,0) -- MG 151 / MG 17
+	
+	gred.HandleLandingGear(self,"gears")
+	gred.PartThink(self,skin)
+	--[[
+	
+		Bodygroup list
+		SELF :
+			1 : Undercarriage bomb pylons
+				0 : blank
+				1 : 1xbomb
+				2 : 4xbombs
+			2 : Nose guns
+				0 : MG 17s
+				1 : Nothing
+				2 : Mk 108
+				
+		WINGS :
+			1 : MG FF
+				0 : MG FF
+				1 : No MG FF
+			2 : Under wings stuff
+				0 : blank
+				1 : 210mm rockets
+				2 : 15mm MGs
+				3 : 30mm cannons
+				4 : R4M rockets
+				5 : bomb pylons
+	--]]
+	local priAmmo = self:GetAmmoMGFF()
+	local secAmmo = self:GetAmmoSecondary()
+	if self.Parts.wing_l then
+		self.Parts.wing_l:SetBodygroup(1,0)
+		self.Parts.wing_l:SetBodygroup(2,0)
+	else
+		if !self.WING_L_UPDATED then
+			self.WING_L_UPDATED = true
+			self.CannonPos[4] = nil
+			self.CannonPos[2] = nil
+			self.MaxSecondaryAmmo = self.WING_R_UPDATED and 0 or self.MaxSecondaryAmmo / 2
+			self.AmmoMGFF = self.WING_R_UPDATED and 0 or self.AmmoMGFF / 2
+			priAmmo = self.WING_R_UPDATED and 0 or priAmmo / 2
+			secAmmo = self.WING_R_UPDATED and 0 or secAmmo / 2
+			self:SetAmmoMGFF(priAmmo)
+			self:SetAmmoSecondary(secAmmo)
+		end
+	end
+	if self.Parts.wing_r then
+		self.Parts.wing_r:SetBodygroup(1,0)
+		self.Parts.wing_r:SetBodygroup(2,0)
+	else
+		if !self.WING_R_UPDATED then
+			self.WING_R_UPDATED = true
+			self.CannonPos[3] = nil
+			self.CannonPos[1] = nil
+			self.MaxSecondaryAmmo = self.WING_L_UPDATED and 0 or self.MaxSecondaryAmmo / 2
+			self.AmmoMGFF = self.WING_L_UPDATED and 0 or self.AmmoMGFF / 2
+			priAmmo = self.WING_L_UPDATED and 0 or priAmmo / 2
+			secAmmo = self.WING_L_UPDATED and 0 or secAmmo / 2
+			self:SetAmmoMGFF(priAmmo)
+			self:SetAmmoSecondary(secAmmo)
+		end
+	end
+	if priAmmo > self.AmmoMGFF then self:SetAmmoMGFF(self.AmmoMGFF) end
+	if secAmmo > self.MaxSecondaryAmmo then self:SetAmmoSecondary(self.MaxSecondaryAmmo) end
+	self:SetBodygroup(1,0)
+	self:SetBodygroup(2,0)
+end
+
+function ENT:CalcFlightOverride( Pitch, Yaw, Roll, Stability )
+	return gred.PartCalcFlight(self,Pitch,Yaw,Roll,Stability,1,0.2)
 end
 
 function ENT:RunOnSpawn()
@@ -49,6 +112,7 @@ function ENT:RunOnSpawn()
 		end
 	end
 	self.TracerConvar = GetConVar("gred_sv_tracers")
+	gred.InitAircraftParts(self,600)
 end
 
 function ENT:HandleWeapons(Fire1, Fire2)
@@ -195,7 +259,7 @@ function ENT:PrimaryAttack()
 		local pos2=self:LocalToWorld(v)
 		local num = 0.3
 		local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-		gred.CreateBullet(Driver,pos2,ang,"wac_base_7mm",{self},nil,false,Tracer_MG17,20)
+		gred.CreateBullet(Driver,pos2,ang,"wac_base_7mm",self.FILTER,nil,false,Tracer_MG17,20)
 		self:TakePrimaryAmmo()
 
 		local effectdata = EffectData()
@@ -227,7 +291,7 @@ function ENT:SecondaryAttack()
 			local pos2=self:LocalToWorld(v)
 			local num = 1
 			local ang = (self:GetAngles() + Angle(math.Rand(-num,num), math.Rand(-num,num), math.Rand(-num,num)))
-			gred.CreateBullet(Driver,pos2,ang,"wac_base_20mm",{self},nil,false,k > 2 and Tracer_mgff or Tracer_cannon,k > 2 and 50 or 60)
+			gred.CreateBullet(Driver,pos2,ang,"wac_base_20mm",self.FILTER,nil,false,k > 2 and Tracer_mgff or Tracer_cannon,k > 2 and 50 or 60)
 			if (k == 2) then self.NextCannon = ct + 0.08 self:TakeSecondaryAmmo(2) Tracer_cannon = self:UpdateTracers_Cannon() end
 			if (k == 4) then self.NextMGFF = ct + 0.11 self:TakeMGFFAmmo(2) Tracer_mgff = self:UpdateTracers_MGFF() end
 

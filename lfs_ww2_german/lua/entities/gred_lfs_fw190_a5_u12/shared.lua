@@ -93,6 +93,43 @@ ENT.MISSILES			= {
 			[1]			= { Vector(45.6383,116.836,-23.1549), Vector(45.6383,-116.836,-23.1549) }
 }
 
+function ENT:GetCalcViewFilter(ent)
+	return not ent.ClassName == "gred_prop_part"
+end
+
+function ENT:GetPartModelPath(k)
+	return "models/gredwitch/fw190_lfs/fw190_"..k..".mdl"
+end
+
+ENT.PartParents = {
+	
+	gear_l2 	=	"gear_l3",
+	gear_l3 	=	"wing_l",
+	wheel_l 	=	"gear_l",
+	gear_l 		=	"wing_l",
+	gear_l4 	=	"wing_l",
+	aileron_l 	=	"wing_l",
+	flap_l 		=	"wing_l",
+	gear_11 	=	false,
+	
+	gear_r2 	=	"gear_r3",
+	gear_r3 	=	"wing_r",
+	wheel_r 	=	"gear_r",
+	gear_r 		=	"wing_r",
+	gear_r4 	=	"wing_r",
+	aileron_r 	=	"wing_r",
+	flap_r 		=	"wing_r",
+	gear_11 	=	false,
+	
+	wheel_c 	=	"gear_c",
+	gear_c 		=	"tail",
+	rudder 		=	"tail",
+	elevator	=	"tail",
+	
+	tail 		=	false,
+	wing_l 		=	false,
+	wing_r 		=	false,
+}
 
 function ENT:AddDataTables()
 	self:NetworkVar( "Int",11, "AmmoCannon", { KeyName = "cannonammo", Edit = { type = "Int", order = 3,min = 0, max = self.AmmoCannon, category = "Weapons"} } )

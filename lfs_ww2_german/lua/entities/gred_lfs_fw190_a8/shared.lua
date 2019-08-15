@@ -72,11 +72,9 @@ ENT.BulletPos			= {}
 ENT.BulletPos[1]		= Vector(89.94,5.63,30.58)
 ENT.BulletPos[2]		= Vector(89.94,-5.63,30.58)
 
-ENT.NextMGFF			= 0
 ENT.NextCannon			= 0
-ENT.AmmoMGFF			= 280
-ENT.AmmoCannon			= 500
-ENT.MaxPrimaryAmmo 		= 900
+ENT.AmmoCannon			= 780
+ENT.MaxPrimaryAmmo 		= 800
 
 ENT.CannonPos			= {}
 ENT.CannonPos[1]		= Vector(83.8659,-106.278,-9.00239)
@@ -90,6 +88,43 @@ ENT.MISSILEMDL 			= "models/gbombs/nebelwerfer_rocket.mdl"
 ENT.MISSILES			= {
 			[1]			= { Vector(45.6383,116.836,-23.1549), Vector(45.6383,-116.836,-23.1549) }
 }
+function ENT:GetCalcViewFilter(ent)
+	return not ent.ClassName == "gred_prop_part"
+end
+
+function ENT:GetPartModelPath(k)
+	return "models/gredwitch/fw190_lfs/fw190_"..k..".mdl"
+end
+
+ENT.PartParents = {
+	
+	gear_l2 	=	"gear_l3",
+	gear_l3 	=	"wing_l",
+	wheel_l 	=	"gear_l",
+	gear_l 		=	"wing_l",
+	gear_l4 	=	"wing_l",
+	aileron_l 	=	"wing_l",
+	flap_l 		=	"wing_l",
+	gear_11 	=	false,
+	
+	gear_r2 	=	"gear_r3",
+	gear_r3 	=	"wing_r",
+	wheel_r 	=	"gear_r",
+	gear_r 		=	"wing_r",
+	gear_r4 	=	"wing_r",
+	aileron_r 	=	"wing_r",
+	flap_r 		=	"wing_r",
+	gear_11 	=	false,
+	
+	wheel_c 	=	"gear_c",
+	gear_c 		=	"tail",
+	rudder 		=	"tail",
+	elevator	=	"tail",
+	
+	tail 		=	false,
+	wing_l 		=	false,
+	wing_r 		=	false,
+}
 
 
 -- ENT.BOMBS = {
@@ -101,11 +136,11 @@ ENT.MISSILES			= {
 
 function ENT:AddDataTables()
 	self:NetworkVar( "Int",11, "AmmoCannon", { KeyName = "cannonammo", Edit = { type = "Int", order = 3,min = 0, max = self.AmmoCannon, category = "Weapons"} } )
-	self:NetworkVar( "Int",12, "AmmoMGFF", { KeyName = "mgffammo", Edit = { type = "Int", order = 3,min = 0, max = self.AmmoMGFF, category = "Weapons"} } )
+	-- self:NetworkVar( "Int",12, "AmmoMGFF", { KeyName = "mgffammo", Edit = { type = "Int", order = 3,min = 0, max = self.AmmoMGFF, category = "Weapons"} } )
 	self:NetworkVar( "Int",13, "Loadout", { KeyName = "loadout", Edit = { type = "Int", order = 4,min = 0, max = self.Loadouts, category = "Weapons"} } )
 	
 	if SERVER then
-		self:SetAmmoMGFF(self:GetMaxAmmoMGFF())
+		-- self:SetAmmoMGFF(self:GetMaxAmmoMGFF())
 		self:SetAmmoCannon(self:GetMaxAmmoCannon())
 		self:SetLoadout(math.random(0,self.Loadouts))
 	end
