@@ -14,7 +14,11 @@ ENT.Display1_Pos = Vector(79,16.1229,52.6551)
 ENT.Display1_Ang = Angle(-3,270+2.5,64.428)
 ENT.Display2_Pos = Vector(135.77,2.33955,32.1574)
 ENT.Display2_Ang = Angle(0.2,270,63.6973)
-
+ENT.BoneBlackList = {
+	[3] = true,
+	[4] = true,
+	[15] = true,
+}
 local mat = CreateMaterial("UnlitGeneric","GMODScreenspace",{ })
 local ply = LocalPlayer() 
 local CVar = GetConVar("gred_cl_lfs_apache_enable_screens") 
@@ -465,7 +469,6 @@ function ENT:AnimFins()
 	if self.TailDestroyed then
 		self.snd.BEEP_CRASH:Play()
 	end
-	
 	---------------------------
 	
 	self.smPitch = self.smPitch and self.smPitch + (Pitch - self.smPitch) * FT or 0

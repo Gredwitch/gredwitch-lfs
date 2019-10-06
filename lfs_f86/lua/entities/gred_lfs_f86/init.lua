@@ -10,7 +10,7 @@ function ENT:SpawnFunction( ply, tr, ClassName ) -- called by garry
 	ent:SetPos( tr.HitPos + tr.HitNormal * 100 ) -- spawn 20 units above ground
 	ent:Spawn()
 	ent:Activate()
-	ent:SetSkin(math.random(0,15))
+	ent:SetSkin(math.random(0,ent:SkinCount()))
 	return ent
 end
 
