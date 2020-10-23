@@ -150,7 +150,7 @@ function ENT:AnimFins()
 	local Roll = Angle(0,-Ang.r+90)
 	gred.ManipulateBoneAngles(self,"aviahorizon_roll",Roll+Pitch)
 	gred.ManipulateBoneAngles(self,"compass",Angle(0,Ang.y))
-	gred.ManipulateBoneAngles(self,"compass1",Angle(ang.y))
+	gred.ManipulateBoneAngles(self,"compass1",Angle(Ang.y))
 
 	local trace = {
 		start = self:GetPos(),

@@ -1,0 +1,7 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/Mi-8AMTSH/a0bcac4a1"
+	"$halflambert" "1"	
+	"$translucent" "1"			
+	"$nocull" 1
+}

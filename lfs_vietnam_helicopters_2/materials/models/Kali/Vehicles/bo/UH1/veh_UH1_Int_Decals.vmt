@@ -1,0 +1,11 @@
+"VertexlitGeneric"
+{
+
+	"$basetexture" "models\Kali\vehicles\BO\UH1\veh_UH1_Int_Decals"
+	"$halflambert" "1"				
+	"$nocull" 1
+
+	"$translucent" 1		
+}
+
+

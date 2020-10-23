@@ -1,0 +1,12 @@
+"patch"
+{
+	include "materials/models/gredwitch/common/base_wt.vmt"
+	insert
+	{
+	$basetexture			"models/gredwitch/ju88/ju_88a_1_green_a_dmg"
+	$bumpmap				"models/gredwitch/ju88/ju_88a_1_green_n_dmg"
+	
+	$alphatest					1
+	$nocull 					1
+}
+}

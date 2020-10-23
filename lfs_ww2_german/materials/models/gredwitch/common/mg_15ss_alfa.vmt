@@ -1,5 +1,8 @@
-"VertexLitGeneric"
+"patch"
 {
+	include "materials/models/gredwitch/common/base_wt.vmt"
+	insert
+	{
 	$basetexture			"models/gredwitch/common/mg_15ss_alfa_a"
 	// $bumpmap				"models/gredwitch/common/mg_15_flex_tex01_n"
 	$halflambert			1

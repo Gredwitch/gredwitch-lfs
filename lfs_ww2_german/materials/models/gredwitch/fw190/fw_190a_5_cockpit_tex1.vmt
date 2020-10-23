@@ -1,0 +1,14 @@
+"patch"
+{
+	include "materials/models/gredwitch/common/base_wt.vmt"
+	insert
+	{
+	$basetexture			"models/gredwitch/fw190/fw_190a_5_cockpit_tex1"
+	// $bumpmap				"models/gredwitch/fw190/fw_190f_8_n_dmg"
+	$halflambert			1
+	$nocull 				1
+	$alphatest 				1
+
+	// // $phongexponenttexture 	"models/gredwitch/fw190/fw_190f_8_n_dmg"
+}
+}

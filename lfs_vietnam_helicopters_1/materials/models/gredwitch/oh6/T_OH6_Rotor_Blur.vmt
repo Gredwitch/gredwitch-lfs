@@ -1,0 +1,18 @@
+"VertexLitGeneric"
+{
+	$basetexture			"models/gredwitch/oh6/T_OH6_Rotor_Blur"
+	$halflambert			1
+	$nocull 				1
+	$translucent 			1
+
+	$phong 					1
+	$phongboost 			0.7
+	$phongfresnelranges		"[20 20 20]"
+
+	$PhongAlbedoTint 		1
+
+	$rimlight     			1
+	$rimlightexponent   	1
+	$rimlightboost   		0.3
+	$rimmask      			1
+}

@@ -1,0 +1,12 @@
+"patch"
+{
+	include "materials/models/gredwitch/common/base_wt.vmt"
+	insert
+	{
+	$basetexture			"models/gredwitch/fw190/fw_190f_8_a_dmg"
+	$bumpmap				"models/gredwitch/fw190/fw_190f_8_n_dmg"
+	
+	$alphatest					1
+	$nocull 					1
+}
+}

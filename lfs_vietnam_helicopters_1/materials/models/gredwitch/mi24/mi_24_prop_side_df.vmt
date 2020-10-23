@@ -1,0 +1,20 @@
+"VertexLitGeneric"
+{
+	$basetexture			"models/gredwitch/mi24/mi_24_prop_side_df"
+	$bumpmap				"models/gredwitch/mi24/mi_24_prop_side_df_n"
+	$halflambert			1
+	$nocull 				1
+	$alphatest 				1
+
+	$phongexponenttexture 	"models/gredwitch/mi24/mi_24_prop_side_df_n"
+	$phong 					1
+	$phongboost 			0.2
+	$phongfresnelranges		"[2 2 2]"
+
+	$PhongAlbedoTint 		1
+
+	$rimlight     			0
+	$rimlightexponent   	1
+	$rimlightboost   		0.3
+	$rimmask      			1
+}

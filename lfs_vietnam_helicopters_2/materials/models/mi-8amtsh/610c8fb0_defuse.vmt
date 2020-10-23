@@ -1,0 +1,8 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/Mi-8AMTSH/610c8fb0_Defuse"
+	"$bumpmap" "models/Mi-8AMTSH/610c8fb0_Normal"
+	"$surfaceprop" "Glass"
+	"$translucent" 1
+	"$vertexalpha" 1
+}

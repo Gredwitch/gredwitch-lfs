@@ -7,7 +7,7 @@ function ENT:SpawnFunction( ply, tr, ClassName ) -- called by garry
 	if not tr.Hit then return end
 
 	local ent = ents.Create( ClassName )
-	ent:SetPos( tr.HitPos + tr.HitNormal * 90 ) -- spawn 20 units above ground
+	ent:SetPos( tr.HitPos + tr.HitNormal * 100 )
 	ent:Spawn()
 	ent:Activate()
 	ent:SetSkin(table.Random(ent.CleanSkin))

@@ -1,0 +1,7 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/Mi-8AMTSH/mi_8_rotors_opa1"
+	"$surfaceprop" "Metal"
+	"$translucent" 1
+	"$vertexalpha" 1
+}

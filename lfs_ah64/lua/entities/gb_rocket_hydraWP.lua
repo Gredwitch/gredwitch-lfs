@@ -20,68 +20,61 @@ DistExploSnds[3]					 =  "gredwitch/common/bazooka_detonate_wp_far_dist_03.wav"
 ENT.Spawnable		            	 =  false
 ENT.AdminSpawnable		             =  true 
 
-ENT.PrintName		                 =  "[ROCKETS]WP Hydra 70"
-ENT.Author			                 =  ""
-ENT.Contact			                 =  ""
-ENT.Category                         =  "Gredwitch's Stuff"
+AddCSLuaFile()
+
+ENT.Spawnable		       	=	true
+ENT.AdminSpawnable		   	=	true
+
+ENT.PrintName		      	=	"[ROCKETS]M156 Hydra 70 (WP)"
+ENT.Author			      	=	""
+ENT.Contact			      	=	""
+ENT.Category              	=	"Gredwitch's Stuff"
+ENT.Base					=	"base_rocket"
 
 ENT.Model                  		     =  "models/gredwitch/ah64_lfs/hydra70.mdl"
+ENT.RocketTrail          	=	"ins_rockettrail"
+ENT.RocketBurnoutTrail   	=	"grenadetrail"
 ENT.RocketTrail                      =  "ins_rockettrail"
 ENT.RocketBurnoutTrail               =  "grenadetrail"
 ENT.Effect                           =  "doi_wprocket_explosion"
 ENT.EffectAir                        =  "doi_wprocket_explosion"
 ENT.EffectWater                      =  "doi_wprocket_explosion" 
-ENT.AngEffect						 =	true
 
-ENT.ExplosionSound                   =  table.Random(CloseExploSnds)
-ENT.FarExplosionSound				 =  table.Random(ExploSnds)
-ENT.DistExplosionSound				 =  table.Random(DistExploSnds)
-ENT.RSound							 = 0
+ENT.StartSound             	=	"helicoptervehicle/missileshoot.mp3"
+ENT.ArmSound               	=	""
+ENT.ActivationSound        	=	"buttons/button14.wav"
+ENT.EngineSound				=	"Hydra_Engine"
+ENT.StartSoundFollow		=	true
+ENT.AngEffect		=	true
 
-ENT.StartSound                       =  ""          
-ENT.ArmSound                         =  "helicoptervehicle/missileshoot.mp3"            
-ENT.ActivationSound                  =  "buttons/button14.wav"
-
-ENT.EngineSound                  	 =  "Hydra_Engine"
-
-ENT.ShouldUnweld                     =  true          
-ENT.ShouldIgnite                     =  false                
-ENT.SmartLaunch                      =  true  
-ENT.Timed                            =  false 
-
-ENT.ExplosionDamage                  =  50
-ENT.ExplosionRadius                  =  250
-ENT.PhysForce                        =  50
-ENT.SpecialRadius                    =  50
-ENT.MaxIgnitionTime                  =  0
-ENT.Life                             =  1
-ENT.MaxDelay                         =  0
-ENT.TraceLength                      =  1000
-ENT.ImpactSpeed                      =  50         
-ENT.Mass                             =  7             
-ENT.EnginePower                      =  300
-ENT.FuelBurnoutTime                  =  12         
-ENT.IgnitionDelay                    =  0.1           
-ENT.ArmDelay                         =  0
-ENT.RotationalForce                  =  500  
-ENT.ForceOrientation                 =  "NORMAL"
-ENT.Timer                            =  0
-
-ENT.GBOWNER                          =  nil             -- don't you fucking touch this.
+ENT.ExplosionDamage			=	100
+ENT.ExplosionRadius			=	200
+ENT.Mass           			=	4
+ENT.EnginePower    			=	2800 -- 6290
+ENT.FuelBurnoutTime			=	5
+ENT.LinearPenetration		=	10
+ENT.MaxVelocity				=	723
+ENT.Caliber					=	70
+ENT.ShellType				=	"WP"
+-- ENT.RotationalForce			=	500
 
 function ENT:SpawnFunction( ply, tr )
-    if ( !tr.Hit ) then return end
-	self.GBOWNER = ply
+    if (!tr.Hit) then return end
+	
     local ent = ents.Create(self.ClassName)
 	ent:SetPhysicsAttacker(ply)
-    ent:SetPos( tr.HitPos + tr.HitNormal * 16 ) 
+	ent.Owner = ply
+    ent:SetPos(tr.HitPos + tr.HitNormal * 16) 
     ent:Spawn()
     ent:Activate()
 	
-	ent.ExplosionSound = table.Random(CloseExploSnds)
-	ent.FarExplosionSound	= table.Random(ExploSnds)
-	ent.DistExplosionSound	= table.Random(DistExploSnds)
     return ent
+end
+
+function ENT:DoPreInit()
+	self.ExplosionSound = CloseExploSnds[math.random(#CloseExploSnds)]
+	self.FarExplosionSound = ExploSnds[math.random(#ExploSnds)]
+	self.DistExplosionSound = DistExploSnds[math.random(#DistExploSnds)]
 end
 
 function ENT:AddOnExplode()

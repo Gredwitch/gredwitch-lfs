@@ -1,0 +1,8 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/Mi-8AMTSH/mi8_decals_ca"
+	"$bumpmap" "models/Mi-8AMTSH/mi8_decals_nohq"
+	"$surfaceprop" "Metal"
+	"$translucent" 1
+	"$vertexalpha" 1
+}

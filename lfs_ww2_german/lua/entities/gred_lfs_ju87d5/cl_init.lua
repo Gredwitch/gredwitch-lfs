@@ -147,7 +147,7 @@ function ENT:AnimFins()
 		Pitch < 0 && Pitch < -90 then Pitch = -90
 	end
 	Pitch = Angle(-Pitch)
-	local Roll = Angle(0,-ang.r+90)
+	local Roll = Angle(0,-Ang.r+90)
 	gred.ManipulateBoneAngles(self,"aviahorizon_roll",Roll+Pitch)
 	gred.ManipulateBoneAngles(self,"compass",Angle(0,Ang.y))
 	gred.ManipulateBoneAngles(self,"compass1",Angle(Ang.y))

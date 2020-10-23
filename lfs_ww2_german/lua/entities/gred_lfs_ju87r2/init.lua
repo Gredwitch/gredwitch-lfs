@@ -30,7 +30,7 @@ function ENT:SpawnFunction( ply, tr, ClassName ) -- called by garry
 	if not tr.Hit then return end
 
 	local ent = ents.Create( ClassName )
-	ent:SetPos( tr.HitPos + tr.HitNormal * 10 ) -- spawn 20 units above ground
+	ent:SetPos( tr.HitPos + tr.HitNormal * 200 ) -- spawn 20 units above ground
 	ent:Spawn()
 	ent:Activate()
 

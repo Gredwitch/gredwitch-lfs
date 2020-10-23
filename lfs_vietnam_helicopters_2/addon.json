@@ -1,0 +1,6 @@
+{
+"title" : "[LFS] Vietnam Helicopter Pack #2",
+"type" : "vehicle",
+"tags" : ["fun","realism"],
+"ignore" : ["*.psd", "*.ini", "*.svn*"]
+}

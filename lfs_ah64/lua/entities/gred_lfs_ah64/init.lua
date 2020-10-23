@@ -621,14 +621,10 @@ function ENT:FIRE_HYDRAS(ct,ply,count)
 	ent.Model = self.HYDRA_MODEL
 	ent:SetAngles(ang+Angle(-2.5))
 	ent.IsOnPlane = true
-	ent:SetOwner(ply)
+	ent.Owner = ply
 	ent:Spawn()
 	ent:Activate()
-	local p = ent:GetPhysicsObject()
-	if IsValid(p) then 
-		p:EnableCollisions(false)
-	end
-	timer.Simple(0.3,function() if IsValid(p) then p:EnableCollisions(true) end end)
+	self:NoCollide(ent)
 	ent:Launch()
 	
 	ang.y = ang.y + 180

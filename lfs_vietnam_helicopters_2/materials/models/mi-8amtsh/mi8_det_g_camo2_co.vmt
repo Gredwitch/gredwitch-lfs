@@ -1,0 +1,6 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/Mi-8AMTSH/mi8_det_g_camo2_co"
+	"$bumpmap" "models/Mi-8AMTSH/mi8_det_nohq"
+	"$surfaceprop" "Metal"
+}
